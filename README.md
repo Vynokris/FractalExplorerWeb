@@ -25,6 +25,6 @@ Computing buddha sets.
 
 ## Screenshots
 
-<img src="FractalExplorer/Screenshots/fractal0.png" alt="fractal0" width="405"/> <img src="FractalExplorer/Screenshots/fractal1.png" alt="fractal1" width="405"/>
-<img src="FractalExplorer/Screenshots/fractal2.png" alt="fractal2" width="405"/> <img src="FractalExplorer/Screenshots/fractal3.png" alt="fractal3" width="405"/>
-<img src="FractalExplorer/Screenshots/fractal4.png" alt="fractal4" width="405"/> <img src="FractalExplorer/Screenshots/fractal5.png" alt="fractal5" width="405"/>
+<img src="FractalExplorer/Screenshots/fractal0.png" alt="fractal0" width="410"/> <img src="FractalExplorer/Screenshots/fractal1.png" alt="fractal1" width="410"/>
+<img src="FractalExplorer/Screenshots/fractal2.png" alt="fractal2" width="410"/> <img src="FractalExplorer/Screenshots/fractal3.png" alt="fractal3" width="410"/>
+<img src="FractalExplorer/Screenshots/fractal4.png" alt="fractal4" width="410"/> <img src="FractalExplorer/Screenshots/fractal5.png" alt="fractal5" width="410"/>
