@@ -46,11 +46,11 @@ public:
     FractalTypes curFractal = FractalTypes::Mandelbrot;
 
     FractalRenderer(const Vector2& _screenSize);
+    ~FractalRenderer();
     void  SendDataToShader();
     void  Draw();
     void  StartImageExport();
     float GetExportScale();
     void  SetExportScale(const float& _exportScale);
-    void  ProcessInputs();
     void  ValueModifiedThisFrame(const ModifiableValues& modifiedValue);
 };

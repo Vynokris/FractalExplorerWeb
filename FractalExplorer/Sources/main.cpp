@@ -1,28 +1,54 @@
 #include "FractalRenderer.h"
 #include "Ui.h"
+#if defined PLATFORM_WEB
+    #include <emscripten/emscripten.h>
+#endif
+
+void UpdateAndDrawFrame()
+{
+    // Setup fractal renderer and imgui.
+    static FractalRenderer renderer({ 1728, 972 });
+    static Ui              ui      (renderer);
+
+    // Main loop.
+    BeginDrawing();
+    {
+        renderer.Draw();
+        ui.Draw();
+    }
+    EndDrawing();
+    if (!ui.IsInteractedWith())
+    {
+        ui.ProcessInputs();
+    }
+}
 
 int main(void)
 {
-    // Setup fractal renderer and imgui.
-    FractalRenderer renderer({ 1728, 972 });
-    Ui              ui      (renderer);
+    #if defined PLATFORM_WEB
+        emscripten_set_main_loop(UpdateAndDrawFrame, 60, 1);
+    #else
+        // Setup fractal renderer and imgui.
+        FractalRenderer renderer({ 1728, 972 });
+        Ui              ui      (renderer);
 
-    // Main loop.
-    while (!WindowShouldClose())
-    {
-        BeginDrawing();
+        // Main loop.
+        while (!WindowShouldClose())
         {
-            renderer.Draw();
-            ui.Draw();
+            BeginDrawing();
+            {
+                renderer.Draw();
+                ui.Draw();
+            }
+            EndDrawing();
+            if (!ui.IsInteractedWith())
+            {
+                ui.ProcessInputs();
+            }
+            if (GetMouseWheelMove())
+                TraceLog(LOG_INFO, "Scrolling!");
         }
-        EndDrawing();
-        if (!ui.IsInteractedWith())
-        {
-            renderer.ProcessInputs();
-        }
-    }
-
-    CloseWindow();
+    #endif
     return 0;
 }
 

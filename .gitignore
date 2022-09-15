@@ -1,4 +1,10 @@
 .vs
 **/x64
-FractalExplorer/Web
+**/*.o
+**/*.d
+FractalExplorer/Web/fractalExplorer.html
+FractalExplorer/Web/fractalExplorer.js
+FractalExplorer/Web/fractalExplorer.wasm
+FractalExplorer/Web/fractalExplorer.data
+FractalExplorer/Web/fractalExplorer.zip
 FractalExplorer/fractal.png

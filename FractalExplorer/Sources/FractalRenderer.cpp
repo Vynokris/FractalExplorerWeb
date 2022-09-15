@@ -2,8 +2,8 @@
 #include <cmath>
 #include <string>
 #include <rlgl.h>
-    #include <external/stb_image.h>
-    #include <external/stb_image_write.h>
+#include <external/stb_image.h>
+#include <external/stb_image_write.h>
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
 #endif
@@ -34,6 +34,11 @@ FractalRenderer::FractalRenderer(const Vector2& _screenSize)
     SetShaderValue(fractalShaders[0], GetShaderLocation(fractalShaders[0], "screenSize"), &screenSize, SHADER_UNIFORM_VEC2);
     SetShaderValue(fractalShaders[1], GetShaderLocation(fractalShaders[1], "screenSize"), &screenSize, SHADER_UNIFORM_VEC2);
     SendDataToShader();
+}
+
+FractalRenderer::~FractalRenderer()
+{
+    CloseWindow();
 }
 
 void FractalRenderer::SendDataToShader()
@@ -121,107 +126,6 @@ void FractalRenderer::SetExportScale(const float& _exportScale)
     UnloadRenderTexture(exportTexture);
     exportScale   = _exportScale;
     exportTexture = LoadRenderTexture((int)(1920 * exportScale), (int)(1080 * exportScale));
-}
-
-void FractalRenderer::ProcessInputs()
-{
-    {
-        // Update fractal scale.
-        bool  scaleChanged = false;
-        float scaleSpeed = 0.01f;
-        float prevScale  = scale;
-        if (IsKeyDown(KEY_E)) { scale += scaleSpeed; scaleChanged = true; }
-        if (IsKeyDown(KEY_Q)) { scale -= scaleSpeed; scaleChanged = true; }
-        if (float mouseWheelMove = GetMouseWheelMove()) {
-            scale += mouseWheelMove / 6;
-            scaleChanged = true;
-        }
-
-        if (scaleChanged)
-        {
-            float scaleOffset = (float)(pow(2.0, scale) / pow(2.0, prevScale));
-            offset = { offset.x * scaleOffset, offset.y * scaleOffset };
-            ValueModifiedThisFrame(ModifiableValues::Scale);
-        }
-    }
-
-    {
-        // Update fractal offset.
-        bool  offsetChanged = false;
-        float moveSpeed = 0.01f;
-        if (IsKeyDown(KEY_D)) { offset.x += moveSpeed; offsetChanged = true; }
-        if (IsKeyDown(KEY_A)) { offset.x -= moveSpeed; offsetChanged = true; }
-        if (IsKeyDown(KEY_S)) { offset.y += moveSpeed; offsetChanged = true; }
-        if (IsKeyDown(KEY_W)) { offset.y -= moveSpeed; offsetChanged = true; }
-        if (IsMouseButtonDown(0)) {
-            Vector2 mouseDelta = GetMouseDelta();
-            if (mouseDelta.x != 0 && mouseDelta.y != 0) {
-                offset = { offset.x - mouseDelta.x / 500, offset.y - mouseDelta.y / 500 };
-                offsetChanged = true;
-            }
-        }
-        
-        if (offsetChanged)
-            ValueModifiedThisFrame(ModifiableValues::Offset);
-    }
-
-    {
-        // Update the sine automation parameters.
-        float wlModifSpeed = 0.1f;
-        float aModifSpeed  = 0.0001f;
-        if (IsKeyDown(KEY_KP_3)) sineParams.x += wlModifSpeed;
-        if (IsKeyDown(KEY_KP_1)) sineParams.x -= wlModifSpeed;
-        if (IsKeyDown(KEY_KP_5)) sineParams.y += aModifSpeed;
-        if (IsKeyDown(KEY_KP_2)) sineParams.y -= aModifSpeed;
-        if (sineParams.x < 0.01f)
-            sineParams.x = 0.01f;
-        if (sineParams.y < 0.f)
-            sineParams.y = 0.f;
-    }
-
-    if (curFractal == FractalTypes::JuliaSet)
-    {
-        // Update julia set complex c.
-        bool  complexChanged = false;
-        float cModifSpeed = 0.001f;
-        if (IsKeyDown(KEY_LEFT_SHIFT )) cModifSpeed *= 0.1f;
-        if (IsKeyDown(KEY_RIGHT_SHIFT)) cModifSpeed *= 0.1f;
-        if (IsKeyDown(KEY_RIGHT)) { complexC.x += cModifSpeed; complexChanged = true; }
-        if (IsKeyDown(KEY_LEFT )) { complexC.x -= cModifSpeed; complexChanged = true; }
-        if (IsKeyDown(KEY_UP   )) { complexC.y += cModifSpeed; complexChanged = true; }
-        if (IsKeyDown(KEY_DOWN )) { complexC.y -= cModifSpeed; complexChanged = true; }
-
-        if (sineParams.x >= 0.1 && sineParams.y > 0) 
-            complexChanged = true;
-        if (complexChanged)
-            ValueModifiedThisFrame(ModifiableValues::Complex);
-    }
-
-    {
-        // Update the fractal hues.
-        bool  hueChanged = false;
-        float hueModifSpeed = 0.01f;
-        if (IsKeyDown(KEY_KP_9)) { customHue.x += hueModifSpeed; hueChanged = true; }
-        if (IsKeyDown(KEY_KP_7)) { customHue.x -= hueModifSpeed; hueChanged = true; }
-        if (IsKeyDown(KEY_KP_6)) { customHue.y += hueModifSpeed; hueChanged = true; }
-        if (IsKeyDown(KEY_KP_4)) { customHue.y -= hueModifSpeed; hueChanged = true; }
-
-        if (hueChanged)
-            ValueModifiedThisFrame(ModifiableValues::Hue);
-    }
-
-    // Change the current fractal.
-    static bool enterDownLastFrame = false;
-    if (IsKeyDown(KEY_ENTER) || IsKeyDown(KEY_KP_ENTER))  {
-        if (!enterDownLastFrame) {
-            ++curFractal;
-            ValueModifiedThisFrame(ModifiableValues::CurFractal);
-        }
-        enterDownLastFrame = true;
-    }
-    else {
-        enterDownLastFrame = false;
-    }
 }
 
 void FractalRenderer::ValueModifiedThisFrame(const ModifiableValues& modifiedValue)

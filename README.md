@@ -1,4 +1,15 @@
-# Fractal Explorer
+<style>
+#alignUl {
+    max-width:37%;
+    margin: auto;
+    text-align: left;
+}
+</style>
+
+<div style="text-align: center;">
+
+<img src="FractalExplorer/Screenshots/coverImage.png" alt="coverImage" width="330"/>
+<br><br>
 
 ## Description
 
@@ -18,8 +29,22 @@ To export images, I am currently using stbi, but this will change since this lib
 <br>
 
 ## What I'm currently working on:
-- Fixing mouse controls.
-- Finding a way to zoom further.
-- Exporting higher resolution images.
-- Adding more fractals.
-- Computing buddha sets.
+
+Fixing mouse controls. <br>
+Finding a way to zoom further. <br>
+Exporting higher resolution images. <br>
+Adding more fractals. <br>
+Computing buddha sets.
+
+<br>
+
+## Screenshots
+
+<img src="FractalExplorer/Screenshots/fractal0.png" alt="fractal0" width="330"/>
+<img src="FractalExplorer/Screenshots/fractal1.png" alt="fractal1" width="330"/> <br>
+<img src="FractalExplorer/Screenshots/fractal2.png" alt="fractal2" width="330"/>
+<img src="FractalExplorer/Screenshots/fractal3.png" alt="fractal3" width="330"/> <br>
+<img src="FractalExplorer/Screenshots/fractal4.png" alt="fractal4" width="330"/>
+<img src="FractalExplorer/Screenshots/fractal5.png" alt="fractal5" width="330"/> <br>
+
+</div>
