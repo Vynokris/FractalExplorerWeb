@@ -1,13 +1,3 @@
-<style>
-#alignUl {
-    max-width:37%;
-    margin: auto;
-    text-align: left;
-}
-</style>
-
-<div style="text-align: center;">
-
 <img src="FractalExplorer/Screenshots/coverImage.png" alt="coverImage" width="330"/>
 <br><br>
 
@@ -46,5 +36,3 @@ Computing buddha sets.
 <img src="FractalExplorer/Screenshots/fractal3.png" alt="fractal3" width="330"/> <br>
 <img src="FractalExplorer/Screenshots/fractal4.png" alt="fractal4" width="330"/>
 <img src="FractalExplorer/Screenshots/fractal5.png" alt="fractal5" width="330"/> <br>
-
-</div>
