@@ -1,5 +1,5 @@
 <img src="FractalExplorer/Screenshots/coverImage.png" alt="coverImage" width="330"/>
-<br><br>
+<br>
 
 ## Description
 
