@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Externals">
+      <UniqueIdentifier>{9aa44a94-35a2-46ea-a65c-987565c5bc60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Externals">
+      <UniqueIdentifier>{baf78d33-d34f-480a-acd9-46615c02d8a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Externals\imgui">
+      <UniqueIdentifier>{c537f3ee-12a6-4ce3-ae73-c3d4d7726dd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Externals\raylib">
+      <UniqueIdentifier>{4d7a9841-900d-407a-b634-baa3b8941632}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{665a76e8-799d-42e8-b3bc-0464aeabeca3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Externals\rlImGui">
+      <UniqueIdentifier>{df5d3765-69aa-4f98-ae32-178343b598fb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sources\main.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\raylib\rtextures.c">
+      <Filter>Fichiers sources\Externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\raylib\utils.c">
+      <Filter>Fichiers sources\Externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\FractalRenderer.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Ui.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\imgui\imgui.cpp">
+      <Filter>Fichiers sources\Externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\imgui\imgui_draw.cpp">
+      <Filter>Fichiers sources\Externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\imgui\imgui_stdlib.cpp">
+      <Filter>Fichiers sources\Externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\imgui\imgui_tables.cpp">
+      <Filter>Fichiers sources\Externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\imgui\imgui_widgets.cpp">
+      <Filter>Fichiers sources\Externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\rlImGui\rlImGui.cpp">
+      <Filter>Fichiers sources\Externals</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Includes\imgui\imconfig.h">
+      <Filter>Fichiers d%27en-tête\Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\imgui\imgui.h">
+      <Filter>Fichiers d%27en-tête\Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\imgui\imgui_internal.h">
+      <Filter>Fichiers d%27en-tête\Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\imgui\imgui_stdlib.h">
+      <Filter>Fichiers d%27en-tête\Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\imgui\imstb_rectpack.h">
+      <Filter>Fichiers d%27en-tête\Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\imgui\imstb_textedit.h">
+      <Filter>Fichiers d%27en-tête\Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\imgui\imstb_truetype.h">
+      <Filter>Fichiers d%27en-tête\Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\raylib\config.h">
+      <Filter>Fichiers d%27en-tête\Externals\raylib</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\raylib\raylib.h">
+      <Filter>Fichiers d%27en-tête\Externals\raylib</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\raylib\utils.h">
+      <Filter>Fichiers d%27en-tête\Externals\raylib</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\raylib\rlgl.h">
+      <Filter>Fichiers d%27en-tête\Externals\raylib</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\rlImGui\FA5FreeRegularFontData.h">
+      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\rlImGui\FA5FreeSolidFontData.h">
+      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\rlImGui\ForkAwesomeFontData.h">
+      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\rlImGui\IconsFontAwesome5.h">
+      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\rlImGui\IconsForkAwesome.h">
+      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\rlImGui\rlImGui.h">
+      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\FractalRenderer.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Ui.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\Mandelbrot.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\JuliaSet.frag">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
