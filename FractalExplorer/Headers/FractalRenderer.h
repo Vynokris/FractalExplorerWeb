@@ -28,7 +28,6 @@ class FractalRenderer
 {
 private:
     std::chrono::time_point<std::chrono::system_clock> startTime;
-    const Vector2 screenSize;
     float         exportScale;
     RenderTexture screenTexture, exportTexture;
     Shader        fractalShaders[2];
@@ -38,12 +37,13 @@ private:
     void ExportToImage();
 
 public:
-    float        scale      =   0.f;
-    Vector2      offset     = { 0.f, 0.f };
-    Vector2      complexC   = { -1.35f, 0.05f };
-    Vector2      customHue  = { 2.26893f, 3.14159f };
-    Vector2      sineParams = { 1.f, 0.f };
-    FractalTypes curFractal = FractalTypes::Mandelbrot;
+    float         scale      =   0.f;
+    Vector2       offset     = { 0.f, 0.f };
+    Vector2       complexC   = { -1.35f, 0.05f };
+    Vector2       customHue  = { 2.26893f, 3.14159f };
+    Vector2       sineParams = { 1.f, 0.f };
+    const Vector2 screenSize;
+    FractalTypes  curFractal = FractalTypes::Mandelbrot;
 
     FractalRenderer(const Vector2& _screenSize);
     ~FractalRenderer();

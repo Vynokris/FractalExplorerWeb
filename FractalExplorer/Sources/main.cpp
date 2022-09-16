@@ -17,10 +17,7 @@ void UpdateAndDrawFrame()
         ui.Draw();
     }
     EndDrawing();
-    if (!ui.IsInteractedWith())
-    {
-        ui.ProcessInputs();
-    }
+    ui.ProcessInputs();
 }
 
 int main(void)

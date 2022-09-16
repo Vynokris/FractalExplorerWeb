@@ -18,7 +18,7 @@ const char* FractalNames::names[2] = { "Mandelbrot Set", "Julia Set" };
 
 
 FractalRenderer::FractalRenderer(const Vector2& _screenSize)
-    : screenSize(_screenSize), exportScale(4)
+    :  exportScale(4), screenSize(_screenSize)
 {
     startTime = std::chrono::system_clock::now();
 

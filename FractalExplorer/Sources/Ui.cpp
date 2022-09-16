@@ -171,7 +171,7 @@ void Ui::Draw()
             ImGui::Text("[1-3]     to change the sine automation's duration.");
             ImGui::Text("[2-5]     to change the sine automation's amplitude.");
             ImGui::NewLine();
-            ImGui::Text("Use the mouse to move the fractal and the scroll\nwheel to zoom.");
+            ImGui::Text("Use the mouse to move the fractal and the scroll\nwheel to zoom. Right click to center the selected\npoint.");
             ImGui::NewLine();
             ImGui::Text("You can click and drag on the UI input boxes to edit\nthem gradually.");
         }
@@ -265,6 +265,18 @@ void Ui::ProcessInputs()
                 fractalRenderer.offset = { fractalRenderer.offset.x - mouseDelta.x / 500, fractalRenderer.offset.y - mouseDelta.y / 500 };
                 offsetChanged = true;
             }
+        }
+        static bool rightClickDownLastFrame = false;
+        if (IsMouseButtonDown(1)) {
+            if (!rightClickDownLastFrame) {
+                Vector2 mouseToCenter = { fractalRenderer.screenSize.x / 2 - GetMouseX(), fractalRenderer.screenSize.y / 2 - GetMouseY() };
+                fractalRenderer.offset = { fractalRenderer.offset.x - mouseToCenter.x / 500, fractalRenderer.offset.y - mouseToCenter.y / 500 };
+                offsetChanged = true;
+            }
+            rightClickDownLastFrame = true;
+        }
+        else {
+            rightClickDownLastFrame = false;
         }
         if (offsetChanged)
             fractalRenderer.ValueModifiedThisFrame(ModifiableValues::Offset);
