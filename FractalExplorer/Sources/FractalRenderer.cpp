@@ -8,13 +8,13 @@
     #include <emscripten/emscripten.h>
 #endif
 
+const char* FractalNames::names[FRACTAL_COUNT] = { "Mandelbrot Set", "Burning Ship", "Moon Set" };
+
 FractalTypes operator++(FractalTypes& type)
 {
-    type = static_cast<FractalTypes>(((int)type + 1) % 2);
+    type = static_cast<FractalTypes>(((int)type + 1) % FRACTAL_COUNT);
     return type;
 }
-
-const char* FractalNames::names[2] = { "Mandelbrot Set", "Julia Set" };
 
 
 FractalRenderer::FractalRenderer(const Vector2& _screenSize)
@@ -29,10 +29,8 @@ FractalRenderer::FractalRenderer(const Vector2& _screenSize)
     // Load rendertextures and shaders.
     screenTexture = LoadRenderTexture((int)screenSize.x, (int)screenSize.y);
     exportTexture = LoadRenderTexture((int)(1920 * exportScale), (int)(1080 * exportScale));
-    fractalShaders[0] = LoadShader(NULL, "Shaders/Mandelbrot.frag");
-    fractalShaders[1] = LoadShader(NULL, "Shaders/JuliaSet.frag");
-    SetShaderValue(fractalShaders[0], GetShaderLocation(fractalShaders[0], "screenSize"), &screenSize, SHADER_UNIFORM_VEC2);
-    SetShaderValue(fractalShaders[1], GetShaderLocation(fractalShaders[1], "screenSize"), &screenSize, SHADER_UNIFORM_VEC2);
+    fractalShader = LoadShader(NULL, "Shaders/Fractal.frag");
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "screenSize"), &screenSize, SHADER_UNIFORM_VEC2);
     SendDataToShader();
 }
 
@@ -43,13 +41,17 @@ FractalRenderer::~FractalRenderer()
 
 void FractalRenderer::SendDataToShader()
 {
-    float scaleSquare = (float)pow(2.0, scale);
-    SetShaderValue(fractalShaders[(int)curFractal], GetShaderLocation(fractalShaders[(int)curFractal], "offset"   ), &offset,      SHADER_UNIFORM_VEC2);
-    SetShaderValue(fractalShaders[(int)curFractal], GetShaderLocation(fractalShaders[(int)curFractal], "scale"    ), &scaleSquare, SHADER_UNIFORM_FLOAT);
-    SetShaderValue(fractalShaders[(int)curFractal], GetShaderLocation(fractalShaders[(int)curFractal], "customHue"), &customHue,   SHADER_UNIFORM_VEC2);
-    if (curFractal == FractalTypes::JuliaSet) {
-        SetShaderValue(fractalShaders[(int)curFractal], GetShaderLocation(fractalShaders[(int)curFractal], "complexC"), &complexC, SHADER_UNIFORM_VEC2);
-    }
+    float scaleSquare   = (float)pow(2.0, scale);
+    int   curFractalInt = (int)curFractal;
+    int   juliaSetInt   = (int)renderJuliaSet;
+    int   colorWithZInt = (int)colorPxWithZ;
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "curFractal"), &curFractalInt, SHADER_UNIFORM_INT);
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "juliaSet"  ), &juliaSetInt,   SHADER_UNIFORM_INT);
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "colorWithZ"), &colorWithZInt, SHADER_UNIFORM_INT);
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "offset"    ), &offset,        SHADER_UNIFORM_VEC2);
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "scale"     ), &scaleSquare,   SHADER_UNIFORM_FLOAT);
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "customHue" ), &customHue,     SHADER_UNIFORM_VEC2);
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "complexC"  ), &complexC,      SHADER_UNIFORM_VEC2);
 }
 
 void FractalRenderer::Draw()
@@ -60,7 +62,7 @@ void FractalRenderer::Draw()
         BeginTextureMode(screenTexture);
         {
             ClearBackground(BLACK);
-            BeginShaderMode(fractalShaders[(int)curFractal]);
+            BeginShaderMode(fractalShader);
             {
                 DrawTextureRec(screenTexture.texture, { 0, 0, screenSize.x, -screenSize.y }, { 0, 0 }, WHITE);
             }
@@ -90,7 +92,7 @@ void FractalRenderer::ExportToImage()
     BeginTextureMode(exportTexture);
     {
         ClearBackground(BLACK);
-        BeginShaderMode(fractalShaders[(int)curFractal]);
+        BeginShaderMode(fractalShader);
         {
             DrawTextureRec(exportTexture.texture, { 0, 0, 1920 * exportScale, 1080 * exportScale }, { 0, 0 }, WHITE);
         }
@@ -135,22 +137,22 @@ void FractalRenderer::ValueModifiedThisFrame(const ModifiableValues& modifiedVal
         case ModifiableValues::Scale:
         {
             float scaleSquare = (float)pow(2.0, scale);
-            SetShaderValue(fractalShaders[(int)curFractal], GetShaderLocation(fractalShaders[(int)curFractal], "scale"), &scaleSquare, SHADER_UNIFORM_FLOAT);
+            SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "scale"), &scaleSquare, SHADER_UNIFORM_FLOAT);
         }
         [[fallthrough]];
         case ModifiableValues::Offset:
         {
-            SetShaderValue(fractalShaders[(int)curFractal], GetShaderLocation(fractalShaders[(int)curFractal], "offset"), &offset, SHADER_UNIFORM_VEC2);
+            SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "offset"), &offset, SHADER_UNIFORM_VEC2);
             break;
         }
         case ModifiableValues::Hue:
         {
-            SetShaderValue(fractalShaders[(int)curFractal], GetShaderLocation(fractalShaders[(int)curFractal], "customHue"), &customHue, SHADER_UNIFORM_VEC2);
+            SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "customHue"), &customHue, SHADER_UNIFORM_VEC2);
             break;
         }
         case ModifiableValues::Complex:
         {
-            if (curFractal == FractalTypes::JuliaSet)
+            if (renderJuliaSet)
             {
                 Vector2 animatedC = complexC;
                 if (sineParams.x >= 0.1 && sineParams.y > 0) {
@@ -158,13 +160,22 @@ void FractalRenderer::ValueModifiedThisFrame(const ModifiableValues& modifiedVal
                     float sinOffset = sin(timeSinceStart / sineParams.x) * sineParams.y;
                     animatedC = Vector2({ complexC.x + sinOffset, complexC.y + sinOffset });
                 }
-                SetShaderValue(fractalShaders[(int)curFractal], GetShaderLocation(fractalShaders[(int)curFractal], "complexC"), &animatedC, SHADER_UNIFORM_VEC2);
+                SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "complexC"), &animatedC, SHADER_UNIFORM_VEC2);
             }
             break;
         }
         case ModifiableValues::CurFractal:
         {
-            SendDataToShader();
+            int curFractalInt = (int)curFractal;
+            int juliaSetInt   = (int)renderJuliaSet;
+            SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "curFractal"), &curFractalInt, SHADER_UNIFORM_INT);
+            SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "juliaSet"  ), &juliaSetInt,   SHADER_UNIFORM_INT);
+            break;
+        }
+        case ModifiableValues::ColorStyle:
+        {
+            int colorWithZInt = (int)colorPxWithZ;
+            SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "colorWithZ"), &colorWithZInt, SHADER_UNIFORM_INT);
             break;
         }
         default:

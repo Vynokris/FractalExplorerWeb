@@ -28,7 +28,7 @@ void Ui::Draw()
     interactingWithUi = false;
     BeginRLImGui();
     {
-        if (ImGui::Begin("World Coords", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+        if (ImGui::Begin("Fractal Parameters", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
         {
             // Current fractal.
             ImGui::AlignTextToFramePadding();
@@ -101,7 +101,19 @@ void Ui::Draw()
                 interactingWithUi = true;
             }
 
-            if (fractalRenderer.curFractal == FractalTypes::JuliaSet) 
+            // Checkbox to color pixels using the value of Z.
+            if (ImGui::Checkbox("Alternative pixel coloring", &fractalRenderer.colorPxWithZ)) {
+                fractalRenderer.ValueModifiedThisFrame(ModifiableValues::ColorStyle);
+                interactingWithUi = true;
+            }
+
+            // Checkbox to render julia sets.
+            if (ImGui::Checkbox("Render julia set for the current fractal", &fractalRenderer.renderJuliaSet)) {
+                fractalRenderer.ValueModifiedThisFrame(ModifiableValues::CurFractal);
+                interactingWithUi = true;
+            }
+
+            if (fractalRenderer.renderJuliaSet) 
             {
                 // Complex C.
                 ImGui::AlignTextToFramePadding();
@@ -129,7 +141,7 @@ void Ui::Draw()
         }
         ImGui::End();
 
-        if (ImGui::Begin("Image Saving", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
+        if (ImGui::Begin("Image Saving", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
         {
             // Export scale.
             float exportScale = fractalRenderer.GetExportScale();
@@ -159,17 +171,19 @@ void Ui::Draw()
         }
         ImGui::End();
 
-        if (ImGui::Begin("Keyboard Controls", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
+        if (ImGui::Begin("Keyboard Controls", NULL, /*ImGuiWindowFlags_NoMove | */ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
         {
-            ImGui::Text("[Enter]   to change fractal.");
+            ImGui::Text("[   F   ] to go to the next fractal.");
+            ImGui::Text("[   R   ] to show/hide julia sets of the current fractal.");
+            ImGui::Text("[   T   ] to change the way pixels are colored.");
             ImGui::Text("[W-A-S-D] to move.");
-            ImGui::Text("[Q-E]     to zoom.");
-            ImGui::Text("[4-6]     to change the background color.");
-            ImGui::Text("[7-9]     to change the fractal's  color.");
-            ImGui::Text("[Arrows]  to change the complex.");
-            ImGui::Text("[Shift]   to make the complex change slower.");
-            ImGui::Text("[1-3]     to change the sine automation's duration.");
-            ImGui::Text("[2-5]     to change the sine automation's amplitude.");
+            ImGui::Text("[ Q - E ] to zoom.");
+            ImGui::Text("[ 4 - 6 ] to change the background color.");
+            ImGui::Text("[ 7 - 9 ] to change the fractal's  color.");
+            ImGui::Text("[ Arrows] to change the complex.");
+            ImGui::Text("[ Shift ] to make the complex change slower.");
+            ImGui::Text("[ 1 - 3 ] to change the sine automation's duration.");
+            ImGui::Text("[ 2 - 5 ] to change the sine automation's amplitude.");
             ImGui::NewLine();
             ImGui::Text("Use the mouse to move the fractal and the scroll\nwheel to zoom. Right click to center the selected\npoint.");
             ImGui::NewLine();
@@ -178,7 +192,7 @@ void Ui::Draw()
         ImGui::End();
 
         if (popupOpen) {
-            if (ImGui::Begin("Notes", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
+            if (ImGui::Begin("Notes", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize))
             {
                 // Above 13.5 zoom, images look pixelated and somewhat low export resolution.
                 ImGui::Text("Due to technical limitations, images above\nzoom level 12 can look pixelated and\nexported images are limited to 10922x6144\nresolution.");
@@ -215,16 +229,42 @@ void Ui::ProcessInputs()
     if (!IsInteractedWith())
     {
         // Change the current fractal.
-        static bool enterDownLastFrame = false;
-        if (IsKeyDown(KEY_ENTER) || IsKeyDown(KEY_KP_ENTER)) {
-            if (!enterDownLastFrame) {
+        static bool fDownLastFrame = false;
+        if (IsKeyDown(KEY_F)) {
+            if (!fDownLastFrame) {
                 ++fractalRenderer.curFractal;
                 fractalRenderer.ValueModifiedThisFrame(ModifiableValues::CurFractal);
             }
-            enterDownLastFrame = true;
+            fDownLastFrame = true;
         }
         else {
-            enterDownLastFrame = false;
+            fDownLastFrame = false;
+        }
+        
+        // Show/hide julia sets.
+        static bool rDownLastFrame = false;
+        if (IsKeyDown(KEY_R)) {
+            if (!rDownLastFrame) {
+                fractalRenderer.renderJuliaSet = !fractalRenderer.renderJuliaSet;
+                fractalRenderer.ValueModifiedThisFrame(ModifiableValues::CurFractal);
+            }
+            rDownLastFrame = true;
+        }
+        else {
+            rDownLastFrame = false;
+        }
+        
+        // Color pixels with values of Z.
+        static bool tDownLastFrame = false;
+        if (IsKeyDown(KEY_T)) {
+            if (!tDownLastFrame) {
+                fractalRenderer.colorPxWithZ = !fractalRenderer.colorPxWithZ;
+                fractalRenderer.ValueModifiedThisFrame(ModifiableValues::ColorStyle);
+            }
+            tDownLastFrame = true;
+        }
+        else {
+            tDownLastFrame = false;
         }
 
         // Update fractal scale.
@@ -304,17 +344,17 @@ void Ui::ProcessInputs()
         if (hueChanged)
             fractalRenderer.ValueModifiedThisFrame(ModifiableValues::Hue);
 
-        if (fractalRenderer.curFractal == FractalTypes::JuliaSet)
+        if (fractalRenderer.renderJuliaSet)
         {
             // Update julia set complex c.
             bool  complexChanged = false;
             float cModifSpeed = 0.001f;
             if (IsKeyDown(KEY_LEFT_SHIFT)) cModifSpeed *= 0.1f;
             if (IsKeyDown(KEY_RIGHT_SHIFT)) cModifSpeed *= 0.1f;
-            if (IsKeyDown(KEY_RIGHT)) { fractalRenderer.complexC.x += cModifSpeed; complexChanged = true; }
-            if (IsKeyDown(KEY_LEFT)) { fractalRenderer.complexC.x -= cModifSpeed; complexChanged = true; }
-            if (IsKeyDown(KEY_UP)) { fractalRenderer.complexC.y += cModifSpeed; complexChanged = true; }
-            if (IsKeyDown(KEY_DOWN)) { fractalRenderer.complexC.y -= cModifSpeed; complexChanged = true; }
+            if (IsKeyDown(KEY_RIGHT)) { fractalRenderer.complexC.y += cModifSpeed; complexChanged = true; }
+            if (IsKeyDown(KEY_LEFT )) { fractalRenderer.complexC.y -= cModifSpeed; complexChanged = true; }
+            if (IsKeyDown(KEY_UP   )) { fractalRenderer.complexC.x += cModifSpeed; complexChanged = true; }
+            if (IsKeyDown(KEY_DOWN )) { fractalRenderer.complexC.x -= cModifSpeed; complexChanged = true; }
 
             if (fractalRenderer.sineParams.x >= 0.1 && fractalRenderer.sineParams.y > 0)
                 complexChanged = true;

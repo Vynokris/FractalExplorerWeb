@@ -2,17 +2,19 @@
 #include <raylib.h>
 #include <chrono>
 
+#define FRACTAL_COUNT 3
 enum class FractalTypes
 {
     Mandelbrot,
-    JuliaSet,
+    BurningShip,
+    BubbleSet,
 };
 FractalTypes operator++(FractalTypes& type);
 
 class FractalNames
 {
 public:
-    static const char* names[2];
+    static const char* names[FRACTAL_COUNT];
 };
 
 enum class ModifiableValues
@@ -22,6 +24,7 @@ enum class ModifiableValues
     Hue,
     Complex,
     CurFractal,
+    ColorStyle,
 };
 
 class FractalRenderer
@@ -30,7 +33,7 @@ private:
     std::chrono::time_point<std::chrono::system_clock> startTime;
     float         exportScale;
     RenderTexture screenTexture, exportTexture;
-    Shader        fractalShaders[2];
+    Shader        fractalShader;
     bool          valueModifiedThisFrame = true;
     bool          shouldExportImage      = false;
 
@@ -43,7 +46,9 @@ public:
     Vector2       customHue  = { 2.26893f, 3.14159f };
     Vector2       sineParams = { 1.f, 0.f };
     const Vector2 screenSize;
-    FractalTypes  curFractal = FractalTypes::Mandelbrot;
+    FractalTypes  curFractal     = FractalTypes::Mandelbrot;
+    bool          renderJuliaSet = false;
+    bool          colorPxWithZ   = false;
 
     FractalRenderer(const Vector2& _screenSize);
     ~FractalRenderer();

@@ -42,8 +42,6 @@ int main(void)
             {
                 ui.ProcessInputs();
             }
-            if (GetMouseWheelMove())
-                TraceLog(LOG_INFO, "Scrolling!");
         }
     #endif
     return 0;

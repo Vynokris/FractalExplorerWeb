@@ -190,8 +190,7 @@
     <ClInclude Include="Includes\rlImGui\FA5FreeRegularFontData.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Mandelbrot.frag" />
-    <None Include="Shaders\JuliaSet.frag" />
+    <None Include="Shaders\Fractal.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

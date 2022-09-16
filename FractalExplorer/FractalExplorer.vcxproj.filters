@@ -127,10 +127,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Mandelbrot.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\JuliaSet.frag">
+    <None Include="Shaders\Fractal.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
