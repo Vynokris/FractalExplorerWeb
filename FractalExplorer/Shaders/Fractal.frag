@@ -33,16 +33,6 @@ float Tanh(float x) {
     return (exp(x) - exp(-x)) / (exp(x) + exp(-x));
 }
 
-// Returns the sum of the two given complex numbers.
-vec2 complexSum(const vec2 c1, const vec2 c2) {
-    return vec2(c1.x + c2.x, c1.y + c2.y);
-}
-
-// Returns the substraction of the first given complex number by the second.
-vec2 complexSub(const vec2 c1, const vec2 c2) {
-    return vec2(c1.x + c2.x, c1.y + c2.y);
-}
-
 // Returns the product of the two given complex numbers.
 vec2 complexProd(const vec2 c1, const vec2 c2) {
     return vec2(c1.x*c2.x - c1.y*c2.y, c1.x*c2.y + c1.y*c2.x);
@@ -155,64 +145,68 @@ vec4 HSVtoRGB(const vec4 hsv)
     return color;
 }
 
+vec2 cmul(vec2 a, vec2 b) { return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x); }
+
 
 // Apply the right fractal transformation to z and z2.
-void fractalFunc(inout vec2 z, inout vec2 z2, const vec2 c) 
+bool fractalFunc(inout vec2 z, inout vec2 z2, const vec2 c, const float escapeRadSq) 
 {
-    // Mandelbrot set.
-    if (curFractal == 0)
+    if (z2.x + z2.y < escapeRadSq)
     {
-        z  = complexSum(z2, c);
+        // Mandelbrot set.
+        if (curFractal == 0)
+        {
+            z = z2 + c;
+        }
+        // Burning ship.
+        else if (curFractal == 1)
+        {
+            z = complexSquare(vec2(abs(z.x), abs(z.y))) + c;
+        }
+        // Moon set.
+        else if (curFractal == 2)
+        {
+            z = complexDiv(z + vec2(1, 0), complexExp(z) + c);
+        }
+        z2 = complexSquare(z);
+        return true;
     }
-    // Burning ship.
-    else if (curFractal == 1)
-    {
-        z = complexSum(complexSquare(vec2(abs(z.x), abs(z.y))), c);
-    }
-    // Moon set.
-    else if (curFractal == 2)
-    {
-        z = complexDiv(complexSub(z, vec2(1, 0)), complexSum(complexExp(z), c));
-    }
-    z2 = complexSquare(z);
+    return false;
 }
 
 
 void main()
 {
-    // The point at which a pixel becomes black.
+    // If a point does not escape this radius, it is inside the set.
     float escapeRadius = 2.0;
     float escapeRadSq  = escapeRadius * escapeRadius;
 
-    vec2 c, z, z2;
+    vec2 z, z2, c;
     if (juliaSet == 0)
     {
-        c = (fragTexCoord * screenSize - screenSize / 2.0) / (0.5 * scale * screenSize.y) + offset.xy / scale + vec2(-0.125, 0.0);
+        // Initialize the complex values z, z^2 and c to draw the fractal.
         z  = vec2(0.0, 0.0);
         z2 = z;
+        c = (fragTexCoord * screenSize - screenSize / 2.0) / (0.5 * scale * screenSize.y) + offset.xy / scale + vec2(-0.125, 0.0);
     }
     else
     {
-        c  = complexC;
+        // Initialize the complex values z, z^2 and c to draw the fractal's julia sets.
         z  = (fragTexCoord * screenSize - screenSize / 2.0) / (0.5 * scale * screenSize.y) + offset / scale;
         z2 = complexSquare(z);
+        c  = complexC;
     }
 
-    // Compute the mandelbrot equation.
+    // Compute the fractal equation.
     int i = 0; const int iMax = 500;
     for (int counter = 0; counter < iMax; counter++)
-    {
-        if (z2.x + z2.y < escapeRadSq) 
-        {
+        if (fractalFunc(z, z2, c, escapeRadSq))
             i = counter + 1;
-            fractalFunc(z, z2, c);
-        }
-    };
     
 
-    // Color the pixel in function of the number of iterations.
     if (colorWithZ == 0)
     {
+        // Color the pixel in function of the number of iterations.
         vec4 startHSV  = vec4(0.0,         0.0, 1.0, 1.0); // Black.
         vec4 middleHSV = vec4(customHue.x, 1.0, 1.0, 1.0); // Custom foreground hue.
         vec4 endHSV    = vec4(customHue.y, 1.0, 0.0, 1.0); // Custom background hue.
@@ -234,9 +228,9 @@ void main()
         }
     }
 
-    // Color the pixel in function of z's value and exponent.
     else 
     {
+        // Color the pixel in function of z's value and exponent.
         vec2  scZx = scFloatCreate(z.x, 0);
         vec2  scZy = scFloatCreate(z.y, 0);
         float mixX = mix(float(abs(scZx.y)) / 2.0, 1.0 / scZx.x, 0.5);
