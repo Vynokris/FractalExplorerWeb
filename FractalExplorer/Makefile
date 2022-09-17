@@ -10,7 +10,7 @@ OPTIM_FLAGS ?= -Os
 CXXFLAGS = $(OPTIM_FLAGS) -g -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable
 CPPFLAGS = -IHeaders -IIncludes -IIncludes\imgui -IIncludes\raylib -MMD -DPLATFORM_WEB
 LDFLAGS  = -LLib -sUSE_GLFW=3 -sALLOW_MEMORY_GROWTH=1 -sTOTAL_MEMORY=16777216
-LDFLAGS += --pre-js Web\download.js --preload-file imgui.ini --preload-file Shaders\Mandelbrot.frag --preload-file Shaders\JuliaSet.frag
+LDFLAGS += --pre-js Web\download.js --preload-file imgui.ini --preload-file Shaders\Fractal.frag
 LDLIBS   = -lraylib
 
 DEPS=$(OBJS:.o=.d)

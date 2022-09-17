@@ -1,4 +1,4 @@
-#version 130
+#version 100
 #define complexI vec2(0, 1)
 precision highp float;
 
@@ -15,6 +15,23 @@ uniform vec2  offset;
 uniform float scale;
 uniform vec2  customHue;
 uniform vec2  complexC;
+
+// Manual implementation of sinh since it is not in glsl 100. (credit: https://www.shadertoy.com/view/4d2fDd)
+float Sinh(float area) {
+    float e = 2.718;
+    return (pow(e, area) - pow(e, area * -1.0)) / 2.0;
+}
+
+// Manual implementation of cosh since it is not in glsl 100. (credit: https://www.shadertoy.com/view/4d2fDd)
+float Cosh(float area) {
+    float e = 2.718;
+    return (pow(e, area) + pow(e, area * -1.0)) / 2.0;    
+}
+
+// Manual implementation of cosh since it is not in glsl 100.
+float Tanh(float x) {
+    return (exp(x) - exp(-x)) / (exp(x) + exp(-x));
+}
 
 // Returns the sum of the two given complex numbers.
 vec2 complexSum(const vec2 c1, const vec2 c2) {
@@ -77,31 +94,41 @@ vec2 complexLn(const vec2 c) {
 
 // Returns the cosine of the given complex number.
 vec2 complexCos(const vec2 c) {
-    return vec2(cos(c.x) + sinh(c.y), sin(c.x) + cosh(c.y));
+    return vec2(cos(c.x) + Sinh(c.y), sin(c.x) + Cosh(c.y));
 }
 
 // Returns the sine of the given complex number.
 vec2 complexSin(const vec2 c) {
-    return vec2(sin(c.x) + cosh(c.y), cos(c.x) + sinh(c.y));
+    return vec2(sin(c.x) + Cosh(c.y), cos(c.x) + Sinh(c.y));
 }
 
 // Returns the tangent of the given complex number.
 vec2 complexTan(const vec2 c) {
     float tanX  = tan (c.x),   tanY   = tan (c.y);
-    float tanhX = tanh(c.x),   tanhY  = tanh(c.y);
+    float tanhX = Tanh(c.x),   tanhY  = Tanh(c.y);
     float tanX2 = tanX * tanX, tanhY2 = tanhY * tanhY;
     return vec2((tanX-tanX*tanhY2) / (1.0+tanX2*tanhY2), (tanhY+tanX2*tanhY) / (1.0+tanX2*tanhY2));
 }
 
 // Returns the given float in scientific notation (x: val, y: exponent).
 vec2 scFloatCreate(float val, int exponent) {
-    for (int i = 0; i < 1000 && abs(val) > 100.0; i++) {
-        val /= 10.0;
-        exponent++;
+    for (int i = 0; i < 1000; i++) {
+        if (abs(val) > 100.0) {
+            val /= 10.0;
+            exponent++;
+        }
+        else {
+            break;
+        }
     }
-    while (abs(val) < 1.0 && val != 0.0) {
-        val *= 10.0;
-        exponent--;
+    for (int i = 0; i < 1000; i++) {
+        if (abs(val) < 1.0 && val != 0.0) {
+            val *= 10.0;
+            exponent--;
+        }
+        else {
+            break;
+        }
     }
 
     return vec2(val, float(exponent));
