@@ -28,19 +28,19 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{665a76e8-799d-42e8-b3bc-0464aeabeca3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers d%27en-tête\Externals\rlImGui">
+    <Filter Include="Fichiers sources\Externals\imgui">
+      <UniqueIdentifier>{bba39c5b-5ecc-4ff4-b352-2bd3f36c134d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Externals\imgui\rlImGui">
       <UniqueIdentifier>{df5d3765-69aa-4f98-ae32-178343b598fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Externals\raylib">
+      <UniqueIdentifier>{40708888-2ef7-48bc-9c76-e603c573153c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
       <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Includes\raylib\rtextures.c">
-      <Filter>Fichiers sources\Externals</Filter>
-    </ClCompile>
-    <ClCompile Include="Includes\raylib\utils.c">
-      <Filter>Fichiers sources\Externals</Filter>
     </ClCompile>
     <ClCompile Include="Sources\FractalRenderer.cpp">
       <Filter>Fichiers sources</Filter>
@@ -49,22 +49,28 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="Includes\imgui\imgui.cpp">
-      <Filter>Fichiers sources\Externals</Filter>
+      <Filter>Fichiers sources\Externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="Includes\imgui\imgui_draw.cpp">
-      <Filter>Fichiers sources\Externals</Filter>
+      <Filter>Fichiers sources\Externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="Includes\imgui\imgui_stdlib.cpp">
-      <Filter>Fichiers sources\Externals</Filter>
+      <Filter>Fichiers sources\Externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="Includes\imgui\imgui_tables.cpp">
-      <Filter>Fichiers sources\Externals</Filter>
+      <Filter>Fichiers sources\Externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="Includes\imgui\imgui_widgets.cpp">
-      <Filter>Fichiers sources\Externals</Filter>
+      <Filter>Fichiers sources\Externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="Includes\rlImGui\rlImGui.cpp">
-      <Filter>Fichiers sources\Externals</Filter>
+      <Filter>Fichiers sources\Externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\raylib\rtextures.c">
+      <Filter>Fichiers sources\Externals\raylib</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\raylib\utils.c">
+      <Filter>Fichiers sources\Externals\raylib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -102,22 +108,22 @@
       <Filter>Fichiers d%27en-tête\Externals\raylib</Filter>
     </ClInclude>
     <ClInclude Include="Includes\rlImGui\FA5FreeRegularFontData.h">
-      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+      <Filter>Fichiers d%27en-tête\Externals\imgui\rlImGui</Filter>
     </ClInclude>
     <ClInclude Include="Includes\rlImGui\FA5FreeSolidFontData.h">
-      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+      <Filter>Fichiers d%27en-tête\Externals\imgui\rlImGui</Filter>
     </ClInclude>
     <ClInclude Include="Includes\rlImGui\ForkAwesomeFontData.h">
-      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+      <Filter>Fichiers d%27en-tête\Externals\imgui\rlImGui</Filter>
     </ClInclude>
     <ClInclude Include="Includes\rlImGui\IconsFontAwesome5.h">
-      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+      <Filter>Fichiers d%27en-tête\Externals\imgui\rlImGui</Filter>
     </ClInclude>
     <ClInclude Include="Includes\rlImGui\IconsForkAwesome.h">
-      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+      <Filter>Fichiers d%27en-tête\Externals\imgui\rlImGui</Filter>
     </ClInclude>
     <ClInclude Include="Includes\rlImGui\rlImGui.h">
-      <Filter>Fichiers d%27en-tête\Externals\rlImGui</Filter>
+      <Filter>Fichiers d%27en-tête\Externals\imgui\rlImGui</Filter>
     </ClInclude>
     <ClInclude Include="Headers\FractalRenderer.h">
       <Filter>Fichiers d%27en-tête</Filter>

@@ -2,12 +2,13 @@
 #include <raylib.h>
 #include <chrono>
 
-#define FRACTAL_COUNT 3
+#define FRACTAL_COUNT 4
 enum class FractalTypes
 {
     Mandelbrot,
     BurningShip,
-    BubbleSet,
+    MoonSet,
+    CrossSet,
 };
 FractalTypes operator++(FractalTypes& type);
 

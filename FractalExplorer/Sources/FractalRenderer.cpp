@@ -8,7 +8,7 @@
     #include <emscripten/emscripten.h>
 #endif
 
-const char* FractalNames::names[FRACTAL_COUNT] = { "Mandelbrot Set", "Burning Ship", "Moon Set" };
+const char* FractalNames::names[FRACTAL_COUNT] = { "Mandelbrot Set", "Burning Ship", "Moon Set", "Cross Set" };
 
 FractalTypes operator++(FractalTypes& type)
 {
