@@ -82,6 +82,11 @@ vec2 complexLn(const vec2 c) {
     return vec2(log(complexAbs(c)), complexArg(c));
 }
 
+// Returns the given complex number risen to the given complex power.
+vec2 complexPowC(const vec2 c, const vec2 n) {
+    return complexExp(complexProd(n, complexLn(c)));
+}
+
 // Returns the cosine of the given complex number.
 vec2 complexCos(const vec2 c) {
     return vec2(cos(c.x) + Sinh(c.y), sin(c.x) + Cosh(c.y));
@@ -145,8 +150,6 @@ vec4 HSVtoRGB(const vec4 hsv)
     return color;
 }
 
-vec2 cmul(vec2 a, vec2 b) { return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x); }
-
 
 // Apply the right fractal transformation to z and z2.
 bool fractalFunc(inout vec2 z, inout vec2 z2, const vec2 c, const float escapeRadSq) 
@@ -154,20 +157,23 @@ bool fractalFunc(inout vec2 z, inout vec2 z2, const vec2 c, const float escapeRa
     if (z2.x + z2.y < escapeRadSq)
     {
         // Mandelbrot set.
-        if (curFractal == 0)
-        {
+        if (curFractal == 0) {
             z = z2 + c;
         }
         // Burning ship.
-        else if (curFractal == 1)
-        {
+        else if (curFractal == 1) {
             z = complexSquare(vec2(abs(z.x), abs(z.y))) + c;
         }
         // Moon set.
-        else if (curFractal == 2)
-        {
+        else if (curFractal == 2) {
             z = complexDiv(z + vec2(1, 0), complexExp(z) + c);
         }
+        // Cross set.
+        else if (curFractal == 3) {
+            vec2 zPlusC = z + c;
+            z = complexDiv(vec2(1, 0), complexProd(complexSquare(zPlusC), zPlusC));
+        }
+
         z2 = complexSquare(z);
         return true;
     }
