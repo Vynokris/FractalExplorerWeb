@@ -54,7 +54,7 @@ public:
     Vector2       customHue  = { 2.26893f, 3.14159f };
     Vector2       sineParams = { 1.f, 0.f };
     const Vector2 screenSize;
-    FractalTypes  curFractal     = FractalTypes::TheOrb;
+    FractalTypes  curFractal     = FractalTypes::MandelbrotSet;
     bool          renderJuliaSet = false;
     bool          colorPxWithZ   = false;
 
