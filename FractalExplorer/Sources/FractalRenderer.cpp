@@ -23,7 +23,7 @@ FractalTypes operator--(FractalTypes& type)
 
 
 FractalRenderer::FractalRenderer(const Vector2& _screenSize, const int& targetFPS)
-    :  exportScale(4), screenSize(_screenSize)
+    :  exportScale(4), screenSize(_screenSize), buddhaRenderer(_screenSize, offset, scale)
 {
     startTime = std::chrono::system_clock::now();
 
@@ -76,9 +76,10 @@ void FractalRenderer::UpdateShaderTime()
 
 void FractalRenderer::Draw()
 {
-    if (valueModifiedThisFrame || IsFractalDynamic())
+    if (valueModifiedThisFrame || IsFractalDynamic() || buddhaRenderer.IsRendering())
     {
-        UpdateShaderTime();
+        if (IsFractalDynamic())
+            UpdateShaderTime();
 
         // Draw the current fractal onto the screen rendertexture.
         BeginTextureMode(screenTexture);
@@ -89,6 +90,9 @@ void FractalRenderer::Draw()
                 DrawTextureRec(screenTexture.texture, { 0, 0, screenSize.x, -screenSize.y }, { 0, 0 }, WHITE);
             }
             EndShaderMode();
+
+            if (buddhaRenderer.IsRendering())
+                DrawTexture(buddhaRenderer.GetRenderedTexture(), 0, 0, WHITE);
         }
         EndTextureMode();
     }
@@ -164,6 +168,7 @@ void FractalRenderer::ValueModifiedThisFrame(const ModifiableValues& modifiedVal
         case ModifiableValues::Offset:
         {
             SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "offset"), &offset, SHADER_UNIFORM_VEC2);
+            buddhaRenderer.UpdateScreenBounds();
             break;
         }
         case ModifiableValues::Hue:

@@ -72,6 +72,9 @@
     <ClCompile Include="Includes\raylib\utils.c">
       <Filter>Fichiers sources\Externals\raylib</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\BuddhaRenderer.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Includes\imgui\imconfig.h">
@@ -129,6 +132,9 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Headers\Ui.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\BhuddaRenderer.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

@@ -40,6 +40,7 @@ int main(void)
             EndDrawing();
             ui.ProcessInputs();
         }
+        renderer.buddhaRenderer.~BuddhaRenderer();
     #endif
     return 0;
 }

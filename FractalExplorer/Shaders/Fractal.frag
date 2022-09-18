@@ -162,14 +162,11 @@ vec4 HSVtoRGB(const vec4 hsv)
 // Apply the right fractal transformation to z and z2.
 void fractalFunc(inout int i, const int counter, inout vec2 z, inout vec2 z2, vec2 c, const float escapeRadSq) 
 {
-    // Center all fractals.
-    c += vec2(0.125, 0.0);
-
     if (z2.x + z2.y < escapeRadSq)
     {
         // Mandelbrot Set.
         if (curFractal == 0) {
-            c -= vec2(0.250, 0.0);
+            c -= vec2(0.25, 0.0);
             z = z2 + c;
         }
         // Burning Ship.
@@ -221,12 +218,12 @@ void main()
         // Initialize the complex values z, z^2 and c to draw the fractal.
         z  = vec2(0.0, 0.0);
         z2 = z;
-        c = (fragTexCoord * screenSize - screenSize / 2.0) / (0.5 * scale * screenSize.y) + offset.xy / scale + vec2(-0.125, 0.0);
+        c = (fragTexCoord * screenSize - screenSize * 0.5) / (scale * screenSize.y * 0.5) + offset / scale;
     }
     else
     {
         // Initialize the complex values z, z^2 and c to draw the fractal's julia sets.
-        z  = (fragTexCoord * screenSize - screenSize / 2.0) / (0.5 * scale * screenSize.y) + offset / scale;
+        z  = (fragTexCoord * screenSize - screenSize * 0.5) / (scale * screenSize.y * 0.5) + offset / scale;
         z2 = complexSquare(z);
         c  = complexC + sin(time / sineParams.x) * sineParams.y;
     }

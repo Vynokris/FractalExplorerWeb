@@ -164,17 +164,29 @@ void Ui::Draw()
             if (ImGui::IsItemActive()) {
                 interactingWithUi = true;
             }
-
-            // Export button.
             ImGui::SameLine();
             ImGui::Text("(%dx%d)", (int)(1920 * exportScale), (int)(1080 * exportScale));
             ImGui::PopItemWidth();
+
+            // Export button.
             if (ImGui::Button("Export image")) {
                 ImGui::AlignTextToFramePadding();
                 ImGui::SameLine();
                 ImGui::Text("Exporting...");
                 fractalRenderer.StartImageExport();
                 interactingWithUi = true;
+            }
+        }
+        ImGui::End();
+
+        if (ImGui::Begin("Buddha rendering", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            // Buddha start render button.
+            if (ImGui::Button("Start rendering buddha fractal")) {
+                fractalRenderer.buddhaRenderer.StartRendering();
+            }
+            // Buddha end render button.
+            if (ImGui::Button("Stop rendering buddha fractal")) {
+                fractalRenderer.buddhaRenderer.StopRendering();
             }
         }
         ImGui::End();
