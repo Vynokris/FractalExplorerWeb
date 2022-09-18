@@ -160,17 +160,21 @@ vec4 HSVtoRGB(const vec4 hsv)
 
 
 // Apply the right fractal transformation to z and z2.
-bool fractalFunc(inout vec2 z, inout vec2 z2, vec2 c, const float escapeRadSq) 
+void fractalFunc(inout int i, const int counter, inout vec2 z, inout vec2 z2, vec2 c, const float escapeRadSq) 
 {
+    // Center all fractals.
     c += vec2(0.125, 0.0);
+
     if (z2.x + z2.y < escapeRadSq)
     {
         // Mandelbrot Set.
         if (curFractal == 0) {
+            c -= vec2(0.250, 0.0);
             z = z2 + c;
         }
         // Burning Ship.
         else if (curFractal == 1) {
+            c -= vec2(0.250, 0.0);
             z = complexSquare(vec2(abs(z.x), abs(z.y))) + c;
         }
         // Crescent Moon.
@@ -188,21 +192,20 @@ bool fractalFunc(inout vec2 z, inout vec2 z2, vec2 c, const float escapeRadSq)
             z = complexDiv(z, c) + complexI * complexPow(c * warp, 8.0) + complexDiv(z, warp) / 4.7;
         }
         // The Orb.
-        else if (curFractal == 5) {
-            vec2 modifC = vec2(abs(-c.x), c.y) * 0.95;
-            vec2 warp   = vec2(cos(time + modifC.x), sin(time + modifC.y)) / 10.0;
-            z = complexDiv(z, modifC) + complexI * complexPowC(modifC, complexPow(modifC * warp, 4.0));
+        else if (curFractal == 5 && i < 250) {
+                    c    = vec2(abs(-c.x), c.y);
+            vec2 warp = vec2(cos(time + c.x), sin(time + c.y)) / 10.0;
+            z = complexDiv(z, c) + complexI * complexPowC(c, complexPow(c * warp, 4.0));
         }
         // Lovers' Fractal.
         else if (curFractal == 6) {
-            vec2 modifC = vec2(abs(c.x), c.y) * 0.75 + vec2(0.125, 0.155);
-            z = complexDiv(z2, -complexI + complexPowC(modifC, z)) + modifC;
+            c = vec2(abs(c.x), c.y) * 0.75 + vec2(0.125, 0.155);
+            z = complexDiv(z2, -complexI + complexPowC(c, z)) + c;
         }
 
         z2 = complexSquare(z);
-        return true;
+        i  = counter + 1;
     }
-    return false;
 }
 
 
@@ -229,10 +232,9 @@ void main()
     }
 
     // Compute the fractal equation.
-    int i = 0; int iMax = (curFractal != 5 ? 500 : 200);
+    int i = 0; const int iMax = 500;
     for (int counter = 0; counter < iMax; counter++)
-        if (fractalFunc(z, z2, c, escapeRadSq))
-            i = counter + 1;
+        fractalFunc(i, counter, z, z2, c, escapeRadSq);
     
 
     if (colorWithZ == 0)
