@@ -92,7 +92,7 @@ vec2 complexLog(const vec2 c) {
 
 // Returns the given complex number risen to the given complex power.
 vec2 complexPowC(const vec2 c, const vec2 n) {
-    return complexExp(complexProd(n, complexLog(c)));
+    return complexExp(complexProd(complexLog(c), n));
 }
 
 // Returns the cosine of the given complex number.
@@ -160,8 +160,9 @@ vec4 HSVtoRGB(const vec4 hsv)
 
 
 // Apply the right fractal transformation to z and z2.
-bool fractalFunc(inout vec2 z, inout vec2 z2, const vec2 c, const float escapeRadSq) 
+bool fractalFunc(inout vec2 z, inout vec2 z2, vec2 c, const float escapeRadSq) 
 {
+    c += vec2(0.125, 0.0);
     if (z2.x + z2.y < escapeRadSq)
     {
         // Mandelbrot Set.
@@ -178,7 +179,7 @@ bool fractalFunc(inout vec2 z, inout vec2 z2, const vec2 c, const float escapeRa
         }
         // North Star.
         else if (curFractal == 3) {
-            vec2 zPlusC = z + complexProd((c + vec2(0.125, -0.1)) / 0.65, -complexI);
+            vec2 zPlusC = z + complexProd((c + vec2(0.0, -0.1)) / 0.65, -complexI);
             z = complexDiv(vec2(1.0, 0.0), complexSquare(complexSquare(zPlusC)));
         }
         // Black Hole.
@@ -186,9 +187,15 @@ bool fractalFunc(inout vec2 z, inout vec2 z2, const vec2 c, const float escapeRa
             vec2 warp = vec2(cos(time / 5.0), sin(time / 5.0)) / 10.0;
             z = complexDiv(z, c) + complexI * complexPow(c * warp, 8.0) + complexDiv(z, warp) / 4.7;
         }
-        // Lovers' Fractal.
+        // The Orb.
         else if (curFractal == 5) {
-            vec2 modifC = vec2(abs(c.x + 0.125), c.y) * 0.75 + vec2(0.125, 0.155);
+            vec2 modifC = vec2(abs(-c.x), c.y) * 0.95;
+            vec2 warp   = vec2(cos(time + modifC.x), sin(time + modifC.y)) / 10.0;
+            z = complexDiv(z, modifC) + complexI * complexPowC(modifC, complexPow(modifC * warp, 4.0));
+        }
+        // Lovers' Fractal.
+        else if (curFractal == 6) {
+            vec2 modifC = vec2(abs(c.x), c.y) * 0.75 + vec2(0.125, 0.155);
             z = complexDiv(z2, -complexI + complexPowC(modifC, z)) + modifC;
         }
 
@@ -222,7 +229,7 @@ void main()
     }
 
     // Compute the fractal equation.
-    int i = 0; const int iMax = 500;
+    int i = 0; int iMax = (curFractal != 5 ? 500 : 200);
     for (int counter = 0; counter < iMax; counter++)
         if (fractalFunc(z, z2, c, escapeRadSq))
             i = counter + 1;

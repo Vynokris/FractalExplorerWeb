@@ -7,7 +7,7 @@
 void UpdateAndDrawFrame()
 {
     // Setup fractal renderer and imgui.
-    static FractalRenderer renderer({ 1728, 972 });
+    static FractalRenderer renderer({ 1728, 972 }, 60);
     static Ui              ui      (renderer);
 
     // Main loop.
@@ -26,9 +26,9 @@ int main(void)
         emscripten_set_main_loop(UpdateAndDrawFrame, 60, 1);
     #else
         // Setup fractal renderer and imgui.
-        FractalRenderer renderer({ 1728, 972 });
+        FractalRenderer renderer({ 1728, 972 }, 60);
         Ui              ui      (renderer);
-
+        
         // Main loop.
         while (!WindowShouldClose())
         {
@@ -38,10 +38,7 @@ int main(void)
                 ui.Draw();
             }
             EndDrawing();
-            if (!ui.IsInteractedWith())
-            {
-                ui.ProcessInputs();
-            }
+            ui.ProcessInputs();
         }
     #endif
     return 0;

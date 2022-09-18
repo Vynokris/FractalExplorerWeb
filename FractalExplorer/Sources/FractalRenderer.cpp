@@ -8,7 +8,7 @@
     #include <emscripten/emscripten.h>
 #endif
 
-const char* FractalNames::names[FRACTAL_COUNT] = { "Mandelbrot Set", "Burning Ship", "Crescent Moon", "North Star", "Black Hole", "Lovers' Fractal" };
+const char* FractalNames::names[FRACTAL_COUNT] = { "Mandelbrot Set", "Burning Ship", "Crescent Moon", "North Star", "Black Hole", "The Orb", "Lovers' Fractal" };
 
 FractalTypes operator++(FractalTypes& type)
 {
@@ -22,14 +22,14 @@ FractalTypes operator--(FractalTypes& type)
 }
 
 
-FractalRenderer::FractalRenderer(const Vector2& _screenSize)
+FractalRenderer::FractalRenderer(const Vector2& _screenSize, const int& targetFPS)
     :  exportScale(4), screenSize(_screenSize)
 {
     startTime = std::chrono::system_clock::now();
 
     // Initialize raylib.
     InitWindow((int)screenSize.x, (int)screenSize.y, "Fractal Explorer");
-    SetTargetFPS(60);
+    SetTargetFPS(targetFPS);
     stbi_flip_vertically_on_write(true);
 
     // Load rendertextures and shaders.
@@ -43,6 +43,8 @@ FractalRenderer::FractalRenderer(const Vector2& _screenSize)
 FractalRenderer::~FractalRenderer()
 {
     CloseWindow();
+    UnloadRenderTexture(screenTexture);
+    UnloadRenderTexture(exportTexture);
 }
 
 void FractalRenderer::SendDataToShader()
@@ -61,6 +63,11 @@ void FractalRenderer::SendDataToShader()
     SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "customHue" ), &customHue,     SHADER_UNIFORM_VEC2);
 }
 
+bool FractalRenderer::IsFractalDynamic()
+{
+    return curFractal == FractalTypes::BlackHole || curFractal == FractalTypes::TheOrb || (renderJuliaSet && sineParams.x >= 0.1 && sineParams.y > 0);
+}
+
 void FractalRenderer::UpdateShaderTime()
 {
     float timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime).count() / 1000.f;
@@ -69,7 +76,7 @@ void FractalRenderer::UpdateShaderTime()
 
 void FractalRenderer::Draw()
 {
-    if (valueModifiedThisFrame || (sineParams.x >= 0.1 && sineParams.y > 0) || curFractal == FractalTypes::BlackHole)
+    if (valueModifiedThisFrame || IsFractalDynamic())
     {
         UpdateShaderTime();
 

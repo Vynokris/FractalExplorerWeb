@@ -136,12 +136,12 @@ void TraceLog(int logType, const char *text, ...)
 
     switch (logType)
     {
-        case LOG_TRACE: strcpy(buffer, "TRACE: "); break;
-        case LOG_DEBUG: strcpy(buffer, "DEBUG: "); break;
-        case LOG_INFO: strcpy(buffer, "INFO: "); break;
+        case LOG_TRACE:   strcpy(buffer, "TRACE: "  ); break;
+        case LOG_DEBUG:   strcpy(buffer, "DEBUG: "  ); break;
+        case LOG_INFO:    strcpy(buffer, "INFO: "   ); break;
         case LOG_WARNING: strcpy(buffer, "WARNING: "); break;
-        case LOG_ERROR: strcpy(buffer, "ERROR: "); break;
-        case LOG_FATAL: strcpy(buffer, "FATAL: "); break;
+        case LOG_ERROR:   strcpy(buffer, "ERROR: "  ); break;
+        case LOG_FATAL:   strcpy(buffer, "FATAL: "  ); break;
         default: break;
     }
 

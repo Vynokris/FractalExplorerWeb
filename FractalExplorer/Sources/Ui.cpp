@@ -145,6 +145,7 @@ void Ui::Draw()
                     interactingWithUi = true;
                 }
             }
+            ImGui::Text("FPS: %d | Delta Time: %.2f", GetFPS(), GetFrameTime());
         }
         ImGui::End();
 
