@@ -1,5 +1,6 @@
 #version 100
 #define complexI vec2(0, 1)
+#define pi 3.14159265358979323846264
 precision highp float;
 
 // Input vertex attributes (from vertex shader).
@@ -8,13 +9,15 @@ varying vec4 fragColor;
 
 // Input uniform values.
 uniform vec2  screenSize;
+uniform float time;
 uniform int   curFractal;
 uniform int   juliaSet;
 uniform int   colorWithZ;
 uniform vec2  offset;
 uniform float scale;
-uniform vec2  customHue;
 uniform vec2  complexC;
+uniform vec2  sineParams;
+uniform vec2  customHue;
 
 // Manual implementation of sinh since it is not in glsl 100. (credit: https://www.shadertoy.com/view/4d2fDd)
 float Sinh(float area) {
@@ -54,6 +57,11 @@ float complexArg(const vec2 c) {
     return atan(c.y / c.x);
 }
 
+// Returns the conjugate of the given complex number.
+vec2 complexConj(const vec2 c) {
+    return vec2(c.x, -c.y);
+}
+
 // Returns the square of the given complex number.
 vec2 complexSquare(const vec2 c) {
     return vec2(c.x * c.x - c.y * c.y, 2.0 * c.x * c.y);
@@ -78,13 +86,13 @@ vec2 complexExp(const vec2 c) {
 }
 
 // Returns the natural logarithm of the given complex number.
-vec2 complexLn(const vec2 c) {
+vec2 complexLog(const vec2 c) {
     return vec2(log(complexAbs(c)), complexArg(c));
 }
 
 // Returns the given complex number risen to the given complex power.
 vec2 complexPowC(const vec2 c, const vec2 n) {
-    return complexExp(complexProd(n, complexLn(c)));
+    return complexExp(complexProd(n, complexLog(c)));
 }
 
 // Returns the cosine of the given complex number.
@@ -156,22 +164,32 @@ bool fractalFunc(inout vec2 z, inout vec2 z2, const vec2 c, const float escapeRa
 {
     if (z2.x + z2.y < escapeRadSq)
     {
-        // Mandelbrot set.
+        // Mandelbrot Set.
         if (curFractal == 0) {
             z = z2 + c;
         }
-        // Burning ship.
+        // Burning Ship.
         else if (curFractal == 1) {
             z = complexSquare(vec2(abs(z.x), abs(z.y))) + c;
         }
-        // Moon set.
+        // Crescent Moon.
         else if (curFractal == 2) {
-            z = complexDiv(z + vec2(1, 0), complexExp(z) + c);
+            z = complexDiv(z + vec2(1, 0), complexExp(z) + c / 0.47);
         }
-        // Cross set.
+        // North Star.
         else if (curFractal == 3) {
-            vec2 zPlusC = z + c;
-            z = complexDiv(vec2(1, 0), complexProd(complexSquare(zPlusC), zPlusC));
+            vec2 zPlusC = z + complexProd((c + vec2(0.125, -0.1)) / 0.65, -complexI);
+            z = complexDiv(vec2(1.0, 0.0), complexSquare(complexSquare(zPlusC)));
+        }
+        // Black Hole.
+        else if (curFractal == 4) {
+            vec2 warp = vec2(cos(time / 5.0), sin(time / 5.0)) / 10.0;
+            z = complexDiv(z, c) + complexI * complexPow(c * warp, 8.0) + complexDiv(z, warp) / 4.7;
+        }
+        // Lovers' Fractal.
+        else if (curFractal == 5) {
+            vec2 modifC = vec2(abs(c.x + 0.125), c.y) * 0.75 + vec2(0.125, 0.155);
+            z = complexDiv(z2, -complexI + complexPowC(modifC, z)) + modifC;
         }
 
         z2 = complexSquare(z);
@@ -200,7 +218,7 @@ void main()
         // Initialize the complex values z, z^2 and c to draw the fractal's julia sets.
         z  = (fragTexCoord * screenSize - screenSize / 2.0) / (0.5 * scale * screenSize.y) + offset / scale;
         z2 = complexSquare(z);
-        c  = complexC;
+        c  = complexC + sin(time / sineParams.x) * sineParams.y;
     }
 
     // Compute the fractal equation.
