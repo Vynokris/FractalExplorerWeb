@@ -34,9 +34,15 @@ void Ui::Draw()
             ImGui::AlignTextToFramePadding();
             ImGui::Text("Fractal:          ");
             ImGui::SameLine();
+            if (ImGui::Button("<##gotoLeftFractal")) {
+                --fractalRenderer.curFractal;
+                fractalRenderer.ValueModifiedThisFrame(ModifiableValues::CurFractal);
+                interactingWithUi = true;
+            }
+            ImGui::SameLine();
             ImGui::Text("%s", FractalNames::names[(int)fractalRenderer.curFractal]);
             ImGui::SameLine();
-            if (ImGui::Button(">##changeFractal")) {
+            if (ImGui::Button(">##gotoRightFractal")) {
                 ++fractalRenderer.curFractal;
                 fractalRenderer.ValueModifiedThisFrame(ModifiableValues::CurFractal);
                 interactingWithUi = true;
@@ -132,6 +138,7 @@ void Ui::Draw()
                 ImGui::Text("Sine automation:  ");
                 ImGui::SameLine();
                 if (ImGui::DragFloat2("##sineSlider", &fractalRenderer.sineParams.x, 0.0001f)) {
+                    fractalRenderer.ValueModifiedThisFrame(ModifiableValues::SineParams);
                     interactingWithUi = true;
                 }
                 if (ImGui::IsItemActive()) {
@@ -171,9 +178,9 @@ void Ui::Draw()
         }
         ImGui::End();
 
-        if (ImGui::Begin("Keyboard Controls", NULL, /*ImGuiWindowFlags_NoMove | */ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+        if (ImGui::Begin("Keyboard Controls", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
         {
-            ImGui::Text("[   F   ] to go to the next fractal.");
+            ImGui::Text("[ F - G ] to switch fractals.");
             ImGui::Text("[   R   ] to show/hide julia sets of the current fractal.");
             ImGui::Text("[   T   ] to change the way pixels are colored.");
             ImGui::Text("[W-A-S-D] to move.");
@@ -200,14 +207,14 @@ void Ui::Draw()
 
                 // What I'm working on.
                 ImGui::Text("What I'm working on:\n");
+                ImGui::BulletText("Computing buddha sets.");
+                ImGui::BulletText("Adding more fractals.");
                 ImGui::BulletText("Finding a way to zoom further.");
                 ImGui::BulletText("Exporting higher resolution images.");
-                ImGui::BulletText("Adding more fractals.");
-                ImGui::BulletText("Computing buddha sets.");
 
-                // Close button.
+                // Close button. Pressing any key also closes the popup.
                 ImGui::Indent(265);
-                if (ImGui::Button("Close")) {
+                if (ImGui::Button("Close") || GetKeyPressed() != 0) {
                     popupOpen = false;
                 }
                 ImGui::Unindent(265);
@@ -232,13 +239,24 @@ void Ui::ProcessInputs()
         static bool fDownLastFrame = false;
         if (IsKeyDown(KEY_F)) {
             if (!fDownLastFrame) {
-                ++fractalRenderer.curFractal;
+                --fractalRenderer.curFractal;
                 fractalRenderer.ValueModifiedThisFrame(ModifiableValues::CurFractal);
             }
             fDownLastFrame = true;
         }
         else {
             fDownLastFrame = false;
+        }
+        static bool gDownLastFrame = false;
+        if (IsKeyDown(KEY_G)) {
+            if (!gDownLastFrame) {
+                ++fractalRenderer.curFractal;
+                fractalRenderer.ValueModifiedThisFrame(ModifiableValues::CurFractal);
+            }
+            gDownLastFrame = true;
+        }
+        else {
+            gDownLastFrame = false;
         }
         
         // Show/hide julia sets.
@@ -322,24 +340,27 @@ void Ui::ProcessInputs()
             fractalRenderer.ValueModifiedThisFrame(ModifiableValues::Offset);
 
         // Update the sine automation parameters.
+        bool  sineParamsChanged = false;
         float wlModifSpeed = 0.1f;
         float aModifSpeed = 0.0001f;
-        if (IsKeyDown(KEY_KP_3)) fractalRenderer.sineParams.x += wlModifSpeed;
-        if (IsKeyDown(KEY_KP_1)) fractalRenderer.sineParams.x -= wlModifSpeed;
-        if (IsKeyDown(KEY_KP_5)) fractalRenderer.sineParams.y += aModifSpeed;
-        if (IsKeyDown(KEY_KP_2)) fractalRenderer.sineParams.y -= aModifSpeed;
+        if (IsKeyDown(KEY_KP_3)) { fractalRenderer.sineParams.x += wlModifSpeed; sineParamsChanged = true; }
+        if (IsKeyDown(KEY_KP_1)) { fractalRenderer.sineParams.x -= wlModifSpeed; sineParamsChanged = true; }
+        if (IsKeyDown(KEY_KP_5)) { fractalRenderer.sineParams.y += aModifSpeed;  sineParamsChanged = true; }
+        if (IsKeyDown(KEY_KP_2)) { fractalRenderer.sineParams.y -= aModifSpeed;  sineParamsChanged = true; }
         if (fractalRenderer.sineParams.x < 0.01f)
             fractalRenderer.sineParams.x = 0.01f;
         if (fractalRenderer.sineParams.y < 0.f)
             fractalRenderer.sineParams.y = 0.f;
+        if (sineParamsChanged)
+            fractalRenderer.ValueModifiedThisFrame(ModifiableValues::SineParams);
 
         // Update the fractal hues.
         bool  hueChanged = false;
         float hueModifSpeed = 0.01f;
-        if (IsKeyDown(KEY_KP_9)) { fractalRenderer.customHue.x += hueModifSpeed; hueChanged = true; }
-        if (IsKeyDown(KEY_KP_7)) { fractalRenderer.customHue.x -= hueModifSpeed; hueChanged = true; }
-        if (IsKeyDown(KEY_KP_6)) { fractalRenderer.customHue.y += hueModifSpeed; hueChanged = true; }
-        if (IsKeyDown(KEY_KP_4)) { fractalRenderer.customHue.y -= hueModifSpeed; hueChanged = true; }
+        if (IsKeyDown(KEY_KP_9)) { fractalRenderer.customHue.y += hueModifSpeed; hueChanged = true; }
+        if (IsKeyDown(KEY_KP_7)) { fractalRenderer.customHue.y -= hueModifSpeed; hueChanged = true; }
+        if (IsKeyDown(KEY_KP_6)) { fractalRenderer.customHue.x += hueModifSpeed; hueChanged = true; }
+        if (IsKeyDown(KEY_KP_4)) { fractalRenderer.customHue.x -= hueModifSpeed; hueChanged = true; }
 
         if (hueChanged)
             fractalRenderer.ValueModifiedThisFrame(ModifiableValues::Hue);
@@ -356,8 +377,6 @@ void Ui::ProcessInputs()
             if (IsKeyDown(KEY_UP   )) { fractalRenderer.complexC.x += cModifSpeed; complexChanged = true; }
             if (IsKeyDown(KEY_DOWN )) { fractalRenderer.complexC.x -= cModifSpeed; complexChanged = true; }
 
-            if (fractalRenderer.sineParams.x >= 0.1 && fractalRenderer.sineParams.y > 0)
-                complexChanged = true;
             if (complexChanged)
                 fractalRenderer.ValueModifiedThisFrame(ModifiableValues::Complex);
         }

@@ -2,15 +2,18 @@
 #include <raylib.h>
 #include <chrono>
 
-#define FRACTAL_COUNT 4
+#define FRACTAL_COUNT 6
 enum class FractalTypes
 {
-    Mandelbrot,
+    MandelbrotSet,
     BurningShip,
-    MoonSet,
-    CrossSet,
+    CrescentMoon,
+    NorthStar,
+    BlackHole,
+    LoversFractal,
 };
 FractalTypes operator++(FractalTypes& type);
+FractalTypes operator--(FractalTypes& type);
 
 class FractalNames
 {
@@ -24,6 +27,7 @@ enum class ModifiableValues
     Offset,
     Hue,
     Complex,
+    SineParams,
     CurFractal,
     ColorStyle,
 };
@@ -39,6 +43,7 @@ private:
     bool          shouldExportImage      = false;
 
     void ExportToImage();
+    void UpdateShaderTime();
 
 public:
     float         scale      =   0.f;
@@ -47,7 +52,7 @@ public:
     Vector2       customHue  = { 2.26893f, 3.14159f };
     Vector2       sineParams = { 1.f, 0.f };
     const Vector2 screenSize;
-    FractalTypes  curFractal     = FractalTypes::Mandelbrot;
+    FractalTypes  curFractal     = FractalTypes::MandelbrotSet;
     bool          renderJuliaSet = false;
     bool          colorPxWithZ   = false;
 

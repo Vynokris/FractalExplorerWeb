@@ -8,11 +8,16 @@
     #include <emscripten/emscripten.h>
 #endif
 
-const char* FractalNames::names[FRACTAL_COUNT] = { "Mandelbrot Set", "Burning Ship", "Moon Set", "Cross Set" };
+const char* FractalNames::names[FRACTAL_COUNT] = { "Mandelbrot Set", "Burning Ship", "Crescent Moon", "North Star", "Black Hole", "Lovers' Fractal" };
 
 FractalTypes operator++(FractalTypes& type)
 {
     type = static_cast<FractalTypes>(((int)type + 1) % FRACTAL_COUNT);
+    return type;
+}
+FractalTypes operator--(FractalTypes& type)
+{
+    type = static_cast<FractalTypes>((int)type - 1 >= 0 ? (int)type - 1 : FRACTAL_COUNT - 1);
     return type;
 }
 
@@ -25,6 +30,7 @@ FractalRenderer::FractalRenderer(const Vector2& _screenSize)
     // Initialize raylib.
     InitWindow((int)screenSize.x, (int)screenSize.y, "Fractal Explorer");
     SetTargetFPS(60);
+    stbi_flip_vertically_on_write(true);
 
     // Load rendertextures and shaders.
     screenTexture = LoadRenderTexture((int)screenSize.x, (int)screenSize.y);
@@ -50,14 +56,23 @@ void FractalRenderer::SendDataToShader()
     SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "colorWithZ"), &colorWithZInt, SHADER_UNIFORM_INT);
     SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "offset"    ), &offset,        SHADER_UNIFORM_VEC2);
     SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "scale"     ), &scaleSquare,   SHADER_UNIFORM_FLOAT);
-    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "customHue" ), &customHue,     SHADER_UNIFORM_VEC2);
     SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "complexC"  ), &complexC,      SHADER_UNIFORM_VEC2);
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "sineParams"), &sineParams,    SHADER_UNIFORM_VEC2);
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "customHue" ), &customHue,     SHADER_UNIFORM_VEC2);
+}
+
+void FractalRenderer::UpdateShaderTime()
+{
+    float timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime).count() / 1000.f;
+    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "time"), &timeSinceStart, SHADER_UNIFORM_FLOAT);
 }
 
 void FractalRenderer::Draw()
 {
-    if (valueModifiedThisFrame)
+    if (valueModifiedThisFrame || (sineParams.x >= 0.1 && sineParams.y > 0) || curFractal == FractalTypes::BlackHole)
     {
+        UpdateShaderTime();
+
         // Draw the current fractal onto the screen rendertexture.
         BeginTextureMode(screenTexture);
         {
@@ -102,7 +117,6 @@ void FractalRenderer::ExportToImage()
 
     // Save the export rendertexture to an image file.
     Image image = LoadImageFromTexture(exportTexture.texture);
-    // ImageFlipVertical(&image);
     const char* filename = "fractal.png";
 
     #if defined(PLATFORM_WEB)
@@ -153,15 +167,13 @@ void FractalRenderer::ValueModifiedThisFrame(const ModifiableValues& modifiedVal
         case ModifiableValues::Complex:
         {
             if (renderJuliaSet)
-            {
-                Vector2 animatedC = complexC;
-                if (sineParams.x >= 0.1 && sineParams.y > 0) {
-                    float timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime).count() / 1000.f;
-                    float sinOffset = sin(timeSinceStart / sineParams.x) * sineParams.y;
-                    animatedC = Vector2({ complexC.x + sinOffset, complexC.y + sinOffset });
-                }
-                SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "complexC"), &animatedC, SHADER_UNIFORM_VEC2);
-            }
+                SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "complexC"), &complexC, SHADER_UNIFORM_VEC2);
+            break;
+        }
+        case ModifiableValues::SineParams:
+        {
+            if (renderJuliaSet)
+                SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "sineParams"), &sineParams, SHADER_UNIFORM_VEC2);
             break;
         }
         case ModifiableValues::CurFractal:
