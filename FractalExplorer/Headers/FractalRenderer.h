@@ -49,16 +49,18 @@ private:
     void UpdateShaderTime();
 
 public:
+    const Vector2  screenSize;
     float          scale      =   0.f;
     Vector2        offset     = { 0.f, 0.f };
     Vector2        complexC   = { -1.35f, 0.05f };
     Vector2        customHue  = { 2.26893f, 3.14159f };
     Vector2        sineParams = { 1.f, 0.f };
-    const Vector2  screenSize;
+
     FractalTypes   curFractal     = FractalTypes::MandelbrotSet;
     bool           renderJuliaSet = false;
     bool           colorPxWithZ   = false;
     BuddhaRenderer buddhaRenderer;
+    bool           renderBuddha   = false;
 
     FractalRenderer(const Vector2& _screenSize, const int& targetFPS);
     ~FractalRenderer();

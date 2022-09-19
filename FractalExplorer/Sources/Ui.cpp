@@ -168,6 +168,26 @@ void Ui::Draw()
             ImGui::Text("(%dx%d)", (int)(1920 * exportScale), (int)(1080 * exportScale));
             ImGui::PopItemWidth();
 
+            // Render buddha fractal checkbox.
+            if (ImGui::Checkbox("Render buddha fractal", &fractalRenderer.renderBuddha)) {
+                interactingWithUi = true;
+            }
+
+            if (fractalRenderer.renderBuddha) {
+                // Buddha fractal color.
+                ImGui::Text("Buddha fractal color: ");
+                if (ImGui::ColorEdit3("##buddhaColEdit", &fractalRenderer.buddhaRenderer.renderColor.x)) {
+                    interactingWithUi = true;
+                }
+
+                // Start rendering buddha fractal button.
+                if (ImGui::Button("Start buddha render")) {
+                    interactingWithUi = true;
+                    fractalRenderer.buddhaRenderer.StartRendering();
+                }
+                ImGui::SameLine();
+            }
+
             // Export button.
             if (ImGui::Button("Export image")) {
                 ImGui::AlignTextToFramePadding();

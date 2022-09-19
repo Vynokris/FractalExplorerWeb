@@ -23,7 +23,7 @@ FractalTypes operator--(FractalTypes& type)
 
 
 FractalRenderer::FractalRenderer(const Vector2& _screenSize, const int& targetFPS)
-    :  exportScale(4), screenSize(_screenSize), buddhaRenderer(_screenSize, offset, scale)
+    :  exportScale(4), screenSize(_screenSize), buddhaRenderer(_screenSize, offset, scale, exportScale)
 {
     startTime = std::chrono::system_clock::now();
 
@@ -92,7 +92,7 @@ void FractalRenderer::Draw()
             EndShaderMode();
 
             if (buddhaRenderer.IsRendering())
-                DrawTexture(buddhaRenderer.GetRenderedTexture(), 0, 0, WHITE);
+                DrawTexturePro(buddhaRenderer.GetRenderedTexture(), Rectangle{ 0, 0, 1920 * exportScale, 1080 * exportScale }, Rectangle{ 0, 0, screenSize.x, screenSize.y }, Vector2{ 0, 0 }, 0, WHITE);
         }
         EndTextureMode();
     }
@@ -114,33 +114,47 @@ void FractalRenderer::StartImageExport()
 
 void FractalRenderer::ExportToImage()
 {
-    // Draw the current fractal on the export rendertexture.
-    BeginTextureMode(exportTexture);
-    {
-        ClearBackground(BLACK);
-        BeginShaderMode(fractalShader);
-        {
-            DrawTextureRec(exportTexture.texture, { 0, 0, 1920 * exportScale, 1080 * exportScale }, { 0, 0 }, WHITE);
-        }
-        EndShaderMode();
-    }
-    EndTextureMode();
-
-    // Save the export rendertexture to an image file.
-    Image image = LoadImageFromTexture(exportTexture.texture);
+    Image image; image.data = nullptr;
     const char* filename = "fractal.png";
 
-    #if defined(PLATFORM_WEB)
-        int dataSize = 0;
-        unsigned char* fileData = stbi_write_png_to_mem((const unsigned char*)image.data, image.width*4, image.width, image.height, 4, &dataSize);
-        EM_ASM_({ window.download($0, $1, $2) }, filename, fileData, dataSize);
-        RL_FREE(fileData);
-    #else
-        ExportImage(image, filename);
-    #endif
+    if (!renderBuddha)
+    {
+        // Draw the current fractal on the export rendertexture.
+        BeginTextureMode(exportTexture);
+        {
+            ClearBackground(BLACK);
+            BeginShaderMode(fractalShader);
+            {
+                DrawTextureRec(exportTexture.texture, { 0, 0, 1920 * exportScale, 1080 * exportScale }, { 0, 0 }, WHITE);
+            }
+            EndShaderMode();
+        }
+        EndTextureMode();
 
-    UnloadImage(image);
-    shouldExportImage = false;
+        // Save the export rendertexture to an image file.
+        image = LoadImageFromTexture(exportTexture.texture);
+    }
+    else
+    {
+        // Get the buddha renderer's texture.
+        if (buddhaRenderer.IsRendering())
+            image = LoadImageFromTexture(buddhaRenderer.GetRenderedTexture());
+    }
+
+    if (image.data != nullptr)
+    {
+        #if defined(PLATFORM_WEB)
+            int dataSize = 0;
+            unsigned char* fileData = stbi_write_png_to_mem((const unsigned char*)image.data, image.width*4, image.width, image.height, 4, &dataSize);
+            EM_ASM_({ window.download($0, $1, $2) }, filename, fileData, dataSize);
+            RL_FREE(fileData);
+        #else
+            ExportImage(image, filename);
+        #endif
+
+        // UnloadImage(image);
+        shouldExportImage = false;
+    }
 }
 
 float FractalRenderer::GetExportScale()
@@ -168,7 +182,6 @@ void FractalRenderer::ValueModifiedThisFrame(const ModifiableValues& modifiedVal
         case ModifiableValues::Offset:
         {
             SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "offset"), &offset, SHADER_UNIFORM_VEC2);
-            buddhaRenderer.UpdateScreenBounds();
             break;
         }
         case ModifiableValues::Hue:

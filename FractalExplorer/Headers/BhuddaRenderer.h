@@ -14,6 +14,8 @@ private:
 
     Vector2& offset;
     float&   scale;
+    float&   exportScale;
+    Vector2  exportSize;
 
     std::vector<std::thread> threads;
     const float              threadCount = 10;
@@ -32,7 +34,7 @@ private:
 public:
     Vector3 renderColor = { 1.0f, 0.2f, 1.0f };
 
-    BuddhaRenderer(const Vector2& _screenSize, Vector2& _offset, float& _scale);
+    BuddhaRenderer(const Vector2& _screenSize, Vector2& _offset, float& _scale, float& _exportScale);
     ~BuddhaRenderer();
 
     void UpdateScreenBounds();

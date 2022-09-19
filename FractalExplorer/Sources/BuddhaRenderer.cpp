@@ -55,41 +55,50 @@ void BuddhaRenderer::Render(const int& threadId)
             for (int j = 0; j < i; j++) 
             {
                 // Make sure that it is still in the screen bounds.
-                if (screenBounds[0].x <= history[j].x && history[j].x < screenBounds[1].x &&
-                    screenBounds[0].y <= history[j].y && history[j].y < screenBounds[1].y)
+                if (screenBounds[0].x > history[j].x || history[j].x >= screenBounds[1].x ||
+                    screenBounds[0].y > history[j].y || history[j].y >= screenBounds[1].y)
                 {
-                    // Convert the complex coordinates to screen coordinates.
-                    Vector2 cScreenCoords = { remap(history[j].x, screenBounds[0].x, screenBounds[1].x, 0, screenSize.x),
-                                              remap(history[j].y, screenBounds[0].y, screenBounds[1].y, 0, screenSize.y) };
-
-                    // Get the coordinates of the point and its neighboors in the heatmap.
-                    int arrayPos      = (int) cScreenCoords.y * (int)screenSize.x + (int)cScreenCoords.x;
-                    int upArrayPos    = (int)(cScreenCoords.y - 1 >= 0           ? cScreenCoords.y - 1 : cScreenCoords.y) * (int)screenSize.x + (int)cScreenCoords.x;
-                    int downArrayPos  = (int)(cScreenCoords.y + 1 < screenSize.y ? cScreenCoords.y + 1 : cScreenCoords.y) * (int)screenSize.x + (int)cScreenCoords.x;
-                    int leftArrayPos  = (int) cScreenCoords.y * (int)screenSize.x + (int)(cScreenCoords.x - 1 >= 0           ? cScreenCoords.x - 1 : cScreenCoords.x);
-                    int rightArrayPos = (int) cScreenCoords.y * (int)screenSize.x + (int)(cScreenCoords.x + 1 < screenSize.x ? cScreenCoords.x + 1 : cScreenCoords.x);
-
-                    // Increment the heatmap at the screen position of the complex.
-                    writingLock.lock();
-                    heatmap[arrayPos     ] += 2;
-                    heatmap[upArrayPos   ]++;
-                    heatmap[downArrayPos ]++;
-                    heatmap[leftArrayPos ]++;
-                    heatmap[rightArrayPos]++;
-                    if (++heatmap[arrayPos     ] > maxHeatmapVal) maxHeatmapVal = heatmap[arrayPos     ];
-                    if (++heatmap[upArrayPos   ] > maxHeatmapVal) maxHeatmapVal = heatmap[upArrayPos   ];
-                    if (++heatmap[downArrayPos ] > maxHeatmapVal) maxHeatmapVal = heatmap[downArrayPos ];
-                    if (++heatmap[leftArrayPos ] > maxHeatmapVal) maxHeatmapVal = heatmap[leftArrayPos ];
-                    if (++heatmap[rightArrayPos] > maxHeatmapVal) maxHeatmapVal = heatmap[rightArrayPos];
-                    writingLock.unlock();
+                    continue;
                 }
+
+                // Convert the complex coordinates to screen coordinates.
+                Vector2 cScreenCoords = { remap(history[j].x, screenBounds[0].x, screenBounds[1].x, 0, exportSize.x),
+                                          remap(history[j].y, screenBounds[0].y, screenBounds[1].y, 0, exportSize.y) };
+
+                // Make sure the complex's screen coordinates are still inside of the export texture.
+                if (0 > cScreenCoords.x || cScreenCoords.x >= exportSize.x ||
+                    0 > cScreenCoords.y || cScreenCoords.y >= exportSize.y)
+                {
+                    continue;
+                }
+
+                // Get the coordinates of the point and its neighboors in the heatmap.
+                int arrayPos      = (int) cScreenCoords.y * (int)exportSize.x + (int)cScreenCoords.x;
+                int upArrayPos    = (int)(cScreenCoords.y - 1 >= 0            ? cScreenCoords.y - 1 : cScreenCoords.y) * (int)exportSize.x + (int)cScreenCoords.x;
+                int downArrayPos  = (int)(cScreenCoords.y + 1 <  exportSize.y ? cScreenCoords.y + 1 : cScreenCoords.y) * (int)exportSize.x + (int)cScreenCoords.x;
+                int leftArrayPos  = (int) cScreenCoords.y * (int)exportSize.x + (int)(cScreenCoords.x - 1 >= 0            ? cScreenCoords.x - 1 : cScreenCoords.x);
+                int rightArrayPos = (int) cScreenCoords.y * (int)exportSize.x + (int)(cScreenCoords.x + 1 <  exportSize.x ? cScreenCoords.x + 1 : cScreenCoords.x);
+
+                // Increment the heatmap at the screen position of the complex.
+                writingLock.lock();
+                heatmap[arrayPos     ] += 2;
+                heatmap[upArrayPos   ]++;
+                heatmap[downArrayPos ]++;
+                heatmap[leftArrayPos ]++;
+                heatmap[rightArrayPos]++;
+                if (++heatmap[arrayPos     ] > maxHeatmapVal) maxHeatmapVal = heatmap[arrayPos     ];
+                if (++heatmap[upArrayPos   ] > maxHeatmapVal) maxHeatmapVal = heatmap[upArrayPos   ];
+                if (++heatmap[downArrayPos ] > maxHeatmapVal) maxHeatmapVal = heatmap[downArrayPos ];
+                if (++heatmap[leftArrayPos ] > maxHeatmapVal) maxHeatmapVal = heatmap[leftArrayPos ];
+                if (++heatmap[rightArrayPos] > maxHeatmapVal) maxHeatmapVal = heatmap[rightArrayPos];
+                writingLock.unlock();
             }
         }
     }
 }
 
-BuddhaRenderer::BuddhaRenderer(const Vector2& _screenSize, Vector2& _offset, float& _scale)
-    : screenSize(_screenSize), offset(_offset), scale(_scale)
+BuddhaRenderer::BuddhaRenderer(const Vector2& _screenSize, Vector2& _offset, float& _scale, float& _exportScale)
+    : screenSize(_screenSize), offset(_offset), scale(_scale), exportScale(_exportScale)
 {
     for (int i = 0; i < threadCount; i++) {
         threads.push_back(std::move(std::thread(&BuddhaRenderer::Render, std::ref(*this), std::ref(i))));
@@ -115,6 +124,8 @@ void BuddhaRenderer::UpdateScreenBounds()
 {
     if (!rendering.load())
     {
+        exportSize = { 1920 * exportScale, 1080 * exportScale };
+
         float powScale = pow(2.0, scale);
         screenBounds[0] = Vector2{ (             - screenSize.x * 0.5f) / (powScale * screenSize.y * 0.5f) + offset.x / powScale,
                                    (             - screenSize.y * 0.5f) / (powScale * screenSize.y * 0.5f) + offset.y / powScale };
@@ -134,10 +145,13 @@ void BuddhaRenderer::StartRendering()
         delete[] renderData;
     }
 
+    // Update the screen bounds and export size.
+    UpdateScreenBounds();
+
     // Create new buffers and set all the hitcounts to 0.
-    heatmap = new unsigned int [(int)(screenSize.x * screenSize.y)];
-    renderData     = new unsigned char[(int)(screenSize.x * screenSize.y * sizeof(Color))];
-    for (int i = 0; i < (int)(screenSize.x * screenSize.y); i++) {
+    heatmap = new unsigned int [(int)(exportSize.x * exportSize.y)];
+    renderData     = new unsigned char[(int)(exportSize.x * exportSize.y * sizeof(Color))];
+    for (int i = 0; i < (int)(exportSize.x * exportSize.y); i++) {
         heatmap[i] = 0;
     }
 
@@ -157,11 +171,11 @@ Texture2D BuddhaRenderer::GetRenderedTexture()
         return *renderedTexture;
     prevTextureUpdateTime = std::chrono::system_clock::now();
 
-    for (int y = 0; y < (int)screenSize.y; y++) 
+    for (int y = 0; y < (int)exportSize.y; y++) 
     {
-        for (int x = 0; x < (int)screenSize.x; x++) 
+        for (int x = 0; x < (int)exportSize.x; x++) 
         {
-            int arrayPos = y * (int)screenSize.x + x;
+            int arrayPos = y * (int)exportSize.x + x;
             unsigned int hitcount = heatmap[arrayPos];
 
             renderData[arrayPos * sizeof(Color)    ] = (unsigned char)((hitcount / (float)maxHeatmapVal) * 255.f * renderColor.x);
@@ -173,8 +187,8 @@ Texture2D BuddhaRenderer::GetRenderedTexture()
 
     Image image;
     image.data    = renderData;
-    image.width   = screenSize.x;
-    image.height  = screenSize.y;
+    image.width   = exportSize.x;
+    image.height  = exportSize.y;
     image.format  = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
     image.mipmaps = 1;
 
