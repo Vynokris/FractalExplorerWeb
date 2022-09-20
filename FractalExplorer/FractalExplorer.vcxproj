@@ -166,12 +166,14 @@
     <ClCompile Include="Includes\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Includes\rlImGui\rlImGui.cpp" />
     <ClCompile Include="Sources\BuddhaRenderer.cpp" />
+    <ClCompile Include="Sources\ComplexMaths.cpp" />
     <ClCompile Include="Sources\FractalRenderer.cpp" />
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\Ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\BhuddaRenderer.h" />
+    <ClInclude Include="Headers\ComplexMaths.h" />
     <ClInclude Include="Headers\FractalRenderer.h" />
     <ClInclude Include="Headers\Ui.h" />
     <ClInclude Include="Includes\raylib\raylib.h" />

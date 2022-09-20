@@ -171,7 +171,7 @@ void fractalFunc(inout int i, const int counter, inout vec2 z, inout vec2 z2, ve
         }
         // Burning Ship.
         else if (curFractal == 1) {
-            c -= vec2(0.250, 0.0);
+            c -= vec2(0.25, 0.0);
             z = complexSquare(vec2(abs(z.x), abs(z.y))) + c;
         }
         // Crescent Moon.
@@ -190,7 +190,7 @@ void fractalFunc(inout int i, const int counter, inout vec2 z, inout vec2 z2, ve
         }
         // The Orb.
         else if (curFractal == 5 && i < 250) {
-                    c    = vec2(abs(-c.x), c.y);
+                 c    = vec2(abs(-c.x), c.y);
             vec2 warp = vec2(cos(time + c.x), sin(time + c.y)) / 10.0;
             z = complexDiv(z, c) + complexI * complexPowC(c, complexPow(c * warp, 4.0));
         }

@@ -23,7 +23,7 @@ FractalTypes operator--(FractalTypes& type)
 
 
 FractalRenderer::FractalRenderer(const Vector2& _screenSize, const int& targetFPS)
-    :  exportScale(4), screenSize(_screenSize), buddhaRenderer(_screenSize, offset, scale, exportScale)
+    :  exportScale(4), screenSize(_screenSize), buddhaRenderer(_screenSize, curFractal, offset, scale, exportScale)
 {
     startTime = std::chrono::system_clock::now();
 
