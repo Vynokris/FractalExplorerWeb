@@ -9,11 +9,7 @@ CXX = em++ -std=c++17
 OPTIM_FLAGS ?= -Os
 CXXFLAGS = $(OPTIM_FLAGS) -g -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable
 CPPFLAGS = -IHeaders -IIncludes -IIncludes\imgui -IIncludes\raylib -MMD -DPLATFORM_WEB
-LDFLAGS  = -LLib -sUSE_GLFW=3 -sTOTAL_MEMORY=16777216 -pthread -sPTHREAD_POOL_SIZE=10
 LDFLAGS += --pre-js Web\download.js --preload-file imgui.ini --preload-file Shaders\Fractal.frag
-LDLIBS   = -lraylib
-
-DEPS=$(OBJS:.o=.d)
 
 .PHONY: all clean cleanWeb
 

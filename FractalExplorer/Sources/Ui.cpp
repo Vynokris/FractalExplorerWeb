@@ -211,6 +211,7 @@ void Ui::Draw()
         }
         ImGui::End();
 
+        ImGui::SetNextWindowPos({ fractalRenderer.GetScreenSize().x - 416, 0 }, ImGuiCond_Once);
         if (ImGui::Begin("Keyboard Controls", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text("[ F - G ] to switch fractals.");
@@ -232,6 +233,7 @@ void Ui::Draw()
         ImGui::End();
 
         if (popupOpen) {
+            ImGui::SetNextWindowPos({ fractalRenderer.GetScreenSize().x / 2 - 324 / 2, fractalRenderer.GetScreenSize().y / 2 - 212 / 2 }, ImGuiCond_Once);
             if (ImGui::Begin("Notes", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize))
             {
                 // Above 13.5 zoom, images look pixelated and somewhat low export resolution.
@@ -360,7 +362,7 @@ void Ui::ProcessInputs()
         static bool rightClickDownLastFrame = false;
         if (IsMouseButtonDown(1)) {
             if (!rightClickDownLastFrame) {
-                Vector2 mouseToCenter = { fractalRenderer.screenSize.x / 2 - GetMouseX(), fractalRenderer.screenSize.y / 2 - GetMouseY() };
+                Vector2 mouseToCenter = { fractalRenderer.GetScreenSize().x / 2 - GetMouseX(), fractalRenderer.GetScreenSize().y / 2 - GetMouseY() };
                 fractalRenderer.offset = { fractalRenderer.offset.x - mouseToCenter.x / 500, fractalRenderer.offset.y - mouseToCenter.y / 500 };
                 offsetChanged = true;
             }

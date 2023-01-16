@@ -26,7 +26,7 @@ int main(void)
         emscripten_set_main_loop(UpdateAndDrawFrame, 60, 1);
     #else
         // Setup fractal renderer and imgui.
-        FractalRenderer renderer({ 1728, 972 }, 60);
+        FractalRenderer renderer({ -1, -1 }, 60);
         Ui              ui      (renderer);
         
         // Main loop.
