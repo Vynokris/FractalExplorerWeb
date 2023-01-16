@@ -186,19 +186,8 @@ void fractalFunc(inout int i, const int counter, inout vec2 z, inout vec2 z2, ve
             vec2 zPlusC = z + complexProd((c + vec2(0.0, -0.1)) / 0.65, -complexI);
             z = complexDiv(vec2(1.0, 0.0), complexSquare(complexSquare(zPlusC)));
         }
-        // Black Hole.
-        else if (curFractal == 4) {
-            vec2 warp = vec2(cos(time / 5.0), sin(time / 5.0)) / 10.0;
-            z = complexDiv(z, c) + complexI * complexPow(c * warp, 8.0) + complexDiv(z, warp) / 4.7;
-        }
-        // The Orb.
-        else if (curFractal == 5 && i < 250) {
-                    c    = vec2(abs(-c.x), c.y);
-            vec2 warp = vec2(cos(time + c.x), sin(time + c.y)) / 10.0;
-            z = complexDiv(z, c) + complexI * complexPowC(c, complexPow(c * warp, 4.0));
-        }
         // Lovers' Fractal.
-        else if (curFractal == 6) {
+        else if (curFractal == 4) {
             c = vec2(abs(c.x), c.y) * 0.75 + vec2(0.125, 0.155);
             z = complexDiv(z2, -complexI + complexPowC(c, z)) + c;
         }

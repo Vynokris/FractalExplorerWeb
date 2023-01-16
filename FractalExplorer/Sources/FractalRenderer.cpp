@@ -8,7 +8,7 @@
     #include <emscripten/emscripten.h>
 #endif
 
-const char* FractalNames::names[FRACTAL_COUNT] = { "Mandelbrot Set", "Burning Ship", "Crescent Moon", "North Star", "Black Hole", "The Orb", "Lovers' Fractal" };
+const char* FractalNames::names[FRACTAL_COUNT] = { "Mandelbrot Set", "Burning Ship", "Crescent Moon", "North Star", "Lovers' Fractal" };
 
 FractalTypes operator++(FractalTypes& type)
 {
@@ -25,12 +25,18 @@ FractalTypes operator--(FractalTypes& type)
 FractalRenderer::FractalRenderer(const Vector2& _screenSize, const int& targetFPS)
     :  exportScale(4), screenSize(_screenSize)
 {
-    startTime = std::chrono::system_clock::now();
-
     // Initialize raylib.
-    InitWindow((int)screenSize.x, (int)screenSize.y, "Fractal Explorer");
+    InitWindow(screenSize.x < 0 ? 1728 : (int)screenSize.x, screenSize.y < 0 ? 972 : (int)screenSize.y, "Fractal Explorer");
     SetTargetFPS(targetFPS);
     stbi_flip_vertically_on_write(true);
+
+    // Get the monitor size and resize the window.
+    if (screenSize.x < 0 || screenSize.y < 0)
+    {
+        screenSize = { (float)GetMonitorWidth(0), (float)GetMonitorHeight(0) };
+        SetWindowSize((int)screenSize.x, (int)screenSize.y);
+        SetWindowPosition(0, 30);
+    }
 
     // Load rendertextures and shaders.
     screenTexture = LoadRenderTexture((int)screenSize.x, (int)screenSize.y);
@@ -63,23 +69,10 @@ void FractalRenderer::SendDataToShader()
     SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "customHue" ), &customHue,     SHADER_UNIFORM_VEC2);
 }
 
-bool FractalRenderer::IsFractalDynamic()
-{
-    return curFractal == FractalTypes::BlackHole || curFractal == FractalTypes::TheOrb || (renderJuliaSet && sineParams.x >= 0.1 && sineParams.y > 0);
-}
-
-void FractalRenderer::UpdateShaderTime()
-{
-    float timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime).count() / 1000.f;
-    SetShaderValue(fractalShader, GetShaderLocation(fractalShader, "time"), &timeSinceStart, SHADER_UNIFORM_FLOAT);
-}
-
 void FractalRenderer::Draw()
 {
-    if (valueModifiedThisFrame || IsFractalDynamic())
+    if (valueModifiedThisFrame)
     {
-        UpdateShaderTime();
-
         // Draw the current fractal onto the screen rendertexture.
         BeginTextureMode(screenTexture);
         {
@@ -137,11 +130,6 @@ void FractalRenderer::ExportToImage()
 
     UnloadImage(image);
     shouldExportImage = false;
-}
-
-float FractalRenderer::GetExportScale()
-{
-    return exportScale;
 }
 
 void FractalRenderer::SetExportScale(const float& _exportScale)
