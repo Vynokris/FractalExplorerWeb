@@ -35,6 +35,7 @@ enum class ModifiableValues
 class FractalRenderer
 {
 private:
+    std::chrono::time_point<std::chrono::system_clock> startTime;
     Vector2       screenSize;
     float         exportScale;
     RenderTexture screenTexture, exportTexture;
@@ -43,6 +44,7 @@ private:
     bool          shouldExportImage      = false;
 
     void ExportToImage();
+    void UpdateShaderTime();
 
 public:
     float          scale      =   0.f;
