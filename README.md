@@ -11,7 +11,7 @@ When you find a cool place, just click the export button and the app will automa
 ## Technical information
 
 This project is coded in C++, using Raylib to render fractals with shaders. <br>
-The user interface is done using ImGui and its bindings for raylib: [rlImGui](https://github.com/JeffM2501/raylibExtras/tree/index/rlImGui). <br>
+The user interface is done using ImGui and its bindings for raylib: [rlImGui](https://github.com/raylib-extras/rlImGui). <br>
 To export images, I am currently using stbi, but this will change since this library uses way too much memory to export large files.
 
 
